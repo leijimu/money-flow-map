@@ -22,6 +22,8 @@ USDC["USDC"]
 WALLET["数字钱包"]
 CHAIN["区块链"]
 
+WISE["Wise"]
+
 UCARD["U卡"]
 
 CN --> HK
@@ -46,3 +48,5 @@ USDT --> UCARD
 USDC --> UCARD
 
 OS --> UCARD
+HK --> WISE
+WISE --> CEX
