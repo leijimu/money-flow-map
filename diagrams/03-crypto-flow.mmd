@@ -1,0 +1,43 @@
+flowchart LR
+
+BANK["银行体系"]
+
+USD["USD"]
+EUR["EUR"]
+HKD["HKD"]
+
+CEX["中心化交易所 CEX"]
+
+USDT["USDT"]
+USDC["USDC"]
+
+BTC["BTC"]
+ETH["ETH"]
+
+WALLET["数字钱包"]
+
+CHAIN["公链"]
+
+
+BANK --> USD
+BANK --> EUR
+BANK --> HKD
+
+USD --> CEX
+EUR --> CEX
+HKD --> CEX
+
+CEX --> USDT
+CEX --> USDC
+CEX --> BTC
+CEX --> ETH
+
+USDT --> WALLET
+USDC --> WALLET
+BTC --> WALLET
+ETH --> WALLET
+
+WALLET --> CHAIN
+CHAIN --> WALLET
+
+CHAIN --> CEX
