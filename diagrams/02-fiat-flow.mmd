@@ -1,0 +1,43 @@
+flowchart LR
+
+CN["中国大陆银行"]
+HK["香港银行"]
+MO["澳门银行"]
+
+US["美国银行"]
+EU["欧洲银行"]
+SG["新加坡银行"]
+
+CNY["CNY 人民币"]
+HKD["HKD 港币"]
+USD["USD 美元"]
+EUR["EUR 欧元"]
+
+
+CN --> CNY
+
+CNY <--> HKD
+CNY <--> USD
+CNY <--> EUR
+
+HK --> HKD
+HK --> USD
+
+MO --> HKD
+
+US --> USD
+EU --> EUR
+SG --> USD
+
+CN --> HK
+CN --> MO
+
+HK --> US
+HK --> EU
+HK --> SG
+
+MO --> HK
+
+HKD <--> USD
+HKD <--> EUR
+USD <--> EUR
