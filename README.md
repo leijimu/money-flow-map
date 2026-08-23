@@ -1,179 +1,83 @@
-# Money Network Map
-
-Open-source map of global money networks and financial infrastructure.
-
-开放的全球资金网络与金融基础设施关系地图。
-
-## Network Map
-
-```mermaid
 flowchart LR
 
-%% =========================
-%% 银行体系
-%% =========================
+CNY["CNY 人民币"]
+HKD["HKD 港币"]
+USD["USD 美元"]
+EUR["EUR 欧元"]
 
-subgraph BANKS["银行体系"]
+CNBANK["中国大陆银行"]
+HKBANK["香港银行"]
+MOBANK["澳门银行"]
+GLOBALBANK["海外银行"]
 
-    CN["中国大陆银行"]
+PAY["微信 / 支付宝"]
 
-    HK["香港银行"]
+WISE["Wise"]
+N26["N26"]
+IFAST["iFast"]
 
-    MO["澳门银行"]
+CEX["加密货币交易所"]
 
-    US["美国银行"]
+USDT["USDT"]
+USDC["USDC"]
 
-    EU["欧洲银行"]
+BTC["BTC"]
+ETH["ETH"]
 
-    SG["新加坡银行"]
+WALLET["数字钱包"]
+CHAIN["公链"]
 
-end
+UCARD["U卡"]
+VISA["Visa"]
+MC["Mastercard"]
 
-
-%% =========================
-%% 金融服务
-%% =========================
-
-subgraph SERVICES["金融服务"]
-
-    WISE["Wise"]
-
-    N26["N26"]
-
-    IFAST["iFast"]
-
-end
+MERCHANT["全球商户"]
 
 
-%% =========================
-%% 支付
-%% =========================
+CNBANK --> CNY
 
-subgraph PAYMENT["支付体系"]
+CNY <--> HKD
+CNY <--> USD
+CNY <--> EUR
 
-    WX["微信支付"]
+HKD --> HKBANK
+USD --> GLOBALBANK
+EUR --> GLOBALBANK
 
-    ALI["支付宝"]
+CNBANK --> PAY
 
-    APPLE["Apple Pay"]
+HKBANK --> HKD
+HKBANK --> USD
+HKBANK --> EUR
 
-end
+MOBANK --> HKD
 
+HKBANK --> GLOBALBANK
+MOBANK --> HKBANK
 
-%% =========================
-%% 加密资产
-%% =========================
+GLOBALBANK --> USD
+GLOBALBANK --> EUR
 
-subgraph CRYPTO["数字资产"]
+HKBANK --> WISE
+HKBANK --> N26
+HKBANK --> IFAST
 
-    CEX["中心化交易所 CEX"]
-
-    USDT["USDT"]
-
-    USDC["USDC"]
-
-    BTC["BTC"]
-
-    ETH["ETH"]
-
-end
-
-
-%% =========================
-%% 钱包与区块链
-%% =========================
-
-subgraph ONCHAIN["钱包 / 区块链"]
-
-    WALLET["数字钱包"]
-
-    CHAIN["公链"]
-
-end
-
-
-%% =========================
-%% 卡体系
-%% =========================
-
-subgraph CARD["卡体系"]
-
-    UCARD["U卡"]
-
-    VISA["Visa"]
-
-    MC["Mastercard"]
-
-end
-
-
-%% =========================
-%% 银行网络
-%% =========================
-
-CN --> HK
-CN --> MO
-
-HK --> US
-HK --> EU
-HK --> SG
-
-MO --> HK
-
-US --> EU
-US --> SG
-
-
-%% =========================
-%% 金融服务
-%% =========================
-
-HK --> WISE
-HK --> N26
-HK --> IFAST
-
-US --> WISE
-EU --> N26
-SG --> WISE
-
-
-%% =========================
-%% 支付
-%% =========================
-
-CN --> WX
-CN --> ALI
-
-US --> APPLE
-EU --> APPLE
-SG --> APPLE
-
-
-%% =========================
-%% 交易所
-%% =========================
-
-US --> CEX
-EU --> CEX
-SG --> CEX
+GLOBALBANK --> WISE
+GLOBALBANK --> N26
 
 WISE --> CEX
 N26 --> CEX
+IFAST --> CEX
+GLOBALBANK --> CEX
 
-
-%% =========================
-%% 数字资产
-%% =========================
+USD --> CEX
+EUR --> CEX
+HKD --> CEX
 
 CEX --> USDT
 CEX --> USDC
 CEX --> BTC
 CEX --> ETH
-
-
-%% =========================
-%% 钱包 / 区块链
-%% =========================
 
 USDT --> WALLET
 USDC --> WALLET
@@ -183,20 +87,11 @@ ETH --> WALLET
 WALLET --> CHAIN
 CHAIN --> WALLET
 
-
-%% =========================
-%% U卡
-%% =========================
-
 USDT --> UCARD
 USDC --> UCARD
 
 UCARD --> VISA
 UCARD --> MC
 
-VISA --> APPLE
-MC --> APPLE
-
-US --> UCARD
-EU --> UCARD
-SG --> UCARD
+VISA --> MERCHANT
+MC --> MERCHANT
