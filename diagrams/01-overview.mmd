@@ -1,4 +1,3 @@
-```mermaid
 flowchart LR
 
 subgraph FIAT["法币"]
@@ -50,7 +49,6 @@ end
 
 MERCHANT["全球商户"]
 
-
 CN --> CNY
 HK --> HKD
 HK --> USD
@@ -59,13 +57,23 @@ US --> USD
 EU --> EUR
 SG --> USD
 
-CNY <--> HKD
-CNY <--> USD
-CNY <--> EUR
+CNY --> HKD
+HKD --> CNY
 
-HKD <--> USD
-HKD <--> EUR
-USD <--> EUR
+CNY --> USD
+USD --> CNY
+
+CNY --> EUR
+EUR --> CNY
+
+HKD --> USD
+USD --> HKD
+
+HKD --> EUR
+EUR --> HKD
+
+USD --> EUR
+EUR --> USD
 
 CN --> HK
 CN --> MO
