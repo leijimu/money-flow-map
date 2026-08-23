@@ -1,1 +1,129 @@
 
+---
+
+# 2. `diagrams/01-overview.mmd`
+
+```mermaid
+flowchart LR
+
+subgraph FIAT["法币"]
+    CNY["CNY 人民币"]
+    HKD["HKD 港币"]
+    USD["USD 美元"]
+    EUR["EUR 欧元"]
+end
+
+subgraph BANKS["银行"]
+    CN["中国大陆银行"]
+    HK["香港银行"]
+    MO["澳门银行"]
+    US["美国银行"]
+    EU["欧洲银行"]
+    SG["新加坡银行"]
+end
+
+subgraph SERVICES["金融服务"]
+    WISE["Wise"]
+    N26["N26"]
+    IFAST["iFast"]
+end
+
+subgraph PAYMENT["支付"]
+    WX["微信支付"]
+    ALI["支付宝"]
+    APPLE["Apple Pay"]
+end
+
+subgraph CRYPTO["Crypto"]
+    CEX["中心化交易所 CEX"]
+    USDT["USDT"]
+    USDC["USDC"]
+    BTC["BTC"]
+    ETH["ETH"]
+end
+
+subgraph ONCHAIN["链上"]
+    WALLET["数字钱包"]
+    CHAIN["公链"]
+end
+
+subgraph CARD["卡"]
+    UCARD["U卡"]
+    VISA["Visa"]
+    MC["Mastercard"]
+end
+
+MERCHANT["全球商户"]
+
+
+CN --> CNY
+HK --> HKD
+HK --> USD
+MO --> HKD
+US --> USD
+EU --> EUR
+SG --> USD
+
+CNY <--> HKD
+CNY <--> USD
+CNY <--> EUR
+
+HKD <--> USD
+HKD <--> EUR
+USD <--> EUR
+
+CN --> HK
+CN --> MO
+
+HK --> US
+HK --> EU
+HK --> SG
+
+MO --> HK
+
+CN --> WX
+CN --> ALI
+
+HK --> WISE
+HK --> N26
+HK --> IFAST
+
+US --> WISE
+EU --> N26
+SG --> WISE
+
+WISE --> CEX
+N26 --> CEX
+IFAST --> CEX
+
+USD --> CEX
+EUR --> CEX
+HKD --> CEX
+
+CEX --> USDT
+CEX --> USDC
+CEX --> BTC
+CEX --> ETH
+
+USDT --> WALLET
+USDC --> WALLET
+BTC --> WALLET
+ETH --> WALLET
+
+WALLET --> CHAIN
+CHAIN --> WALLET
+
+USDT --> UCARD
+USDC --> UCARD
+
+UCARD --> VISA
+UCARD --> MC
+
+VISA --> APPLE
+MC --> APPLE
+
+VISA --> MERCHANT
+MC --> MERCHANT
+WX --> MERCHANT
+ALI --> MERCHANT
+APPLE --> MERCHANT
