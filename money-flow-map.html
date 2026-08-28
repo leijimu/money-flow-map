@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>喜蜘蛛 · 全球资金网络总图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  #chart { width: 100vw; height: 100vh; }
+  .info {
+    position: fixed; top: 12px; left: 12px; z-index: 10;
+    background: rgba(255,255,255,0.94); padding: 12px 16px; border-radius: 10px;
+    font-size: 12px; color: #333; box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    max-width: 300px; line-height: 1.6;
+  }
+  .info h1 { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: #1a1b1c; }
+  .info .sub { color: #6b7280; font-size: 11px; }
+  .info .tip { margin-top: 6px; color: #9ca3af; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="info">
+  <h1>喜蜘蛛 · 全球资金网络总图</h1>
+  <div class="sub">64 节点 · 11 类实体 · 160+ 资金关系</div>
+  <div class="tip">拖拽平移 · 滚轮缩放 · 点击节点高亮相邻链路</div>
+</div>
+<div id="chart"></div>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script>
+var chart = echarts.init(document.getElementById('chart'));
+var option = {
+  backgroundColor: 'transparent',
+  tooltip: {
+    trigger: 'item',
+    triggerOn: 'click',
+    renderMode: 'richText',
+    confine: true,
+    textStyle: { fontSize: 11, lineHeight: 16 },
+    padding: [8, 10]
+  },
+  legend: {
+    top: 12,
+    right: 16,
+    type: 'scroll',
+    orient: 'vertical',
+    itemWidth: 12,
+    itemHeight: 8,
+    textStyle: { color: '#6B7280', fontSize: 11 }
+  },
+  series: [{
+    type: 'graph',
+    layout: 'force',
+    top: 20,
+    left: 20,
+    right: 160,
+    bottom: 20,
+    roam: true,
+    draggable: true,
+    force: {
+      repulsion: 380,
+      edgeLength: [60, 160],
+      gravity: 0.04,
+      layoutAnimation: false
+    },
+    categories: [
+      { name: '法币', itemStyle: { color: '#5B8FF9' } },
+      { name: '银行', itemStyle: { color: '#5AD8A6' } },
+      { name: '金融服务', itemStyle: { color: '#6DC8EC' } },
+      { name: '支付', itemStyle: { color: '#F6BD16' } },
+      { name: '交易所', itemStyle: { color: '#9270CA' } },
+      { name: '稳定币', itemStyle: { color: '#FF9D4D' } },
+      { name: '加密资产', itemStyle: { color: '#E8684A' } },
+      { name: '公链', itemStyle: { color: '#A0A7E6' } },
+      { name: '钱包', itemStyle: { color: '#C0A6E6' } },
+      { name: '卡', itemStyle: { color: '#D48265' } },
+      { name: '商户', itemStyle: { color: '#8A8A8A' } }
+    ],
+    data: [
+      { id: 'CNY', name: 'CNY 人民币', category: 0, symbolSize: 28 },
+      { id: 'HKD', name: 'HKD 港币', category: 0, symbolSize: 28 },
+      { id: 'USD', name: 'USD 美元', category: 0, symbolSize: 30 },
+      { id: 'EUR', name: 'EUR 欧元', category: 0, symbolSize: 28 },
+      { id: 'GBP', name: 'GBP 英镑', category: 0, symbolSize: 24 },
+      { id: 'SGD', name: 'SGD 新加坡元', category: 0, symbolSize: 24 },
+      { id: 'JPY', name: 'JPY 日元', category: 0, symbolSize: 24 },
+      { id: 'CMB', name: '招商银行', category: 1, symbolSize: 20 },
+      { id: 'BOC_CN', name: '中国银行', category: 1, symbolSize: 20 },
+      { id: 'ICBC', name: '工商银行', category: 1, symbolSize: 20 },
+      { id: 'CCB', name: '建设银行', category: 1, symbolSize: 20 },
+      { id: 'ABC', name: '农业银行', category: 1, symbolSize: 20 },
+      { id: 'HSBC_HK', name: '汇丰香港', category: 1, symbolSize: 20 },
+      { id: 'BOCHK', name: '中银香港', category: 1, symbolSize: 22 },
+      { id: 'HANGSENG', name: '恒生银行', category: 1, symbolSize: 20 },
+      { id: 'SCB_HK', name: '渣打香港', category: 1, symbolSize: 20 },
+      { id: 'BOC_MO', name: '中银澳门', category: 1, symbolSize: 18 },
+      { id: 'BCM', name: '澳门商业银行', category: 1, symbolSize: 18 },
+      { id: 'JPMORGAN', name: 'JPMorgan', category: 1, symbolSize: 22 },
+      { id: 'BOFA', name: 'Bank of America', category: 1, symbolSize: 20 },
+      { id: 'CITI', name: 'Citibank', category: 1, symbolSize: 20 },
+      { id: 'WELLS_FARGO', name: 'Wells Fargo', category: 1, symbolSize: 20 },
+      { id: 'DEUTSCHE_BANK', name: 'Deutsche Bank', category: 1, symbolSize: 20 },
+      { id: 'BNP_PARIBAS', name: 'BNP Paribas', category: 1, symbolSize: 20 },
+      { id: 'UBS', name: 'UBS', category: 1, symbolSize: 20 },
+      { id: 'DBS', name: 'DBS Bank', category: 1, symbolSize: 20 },
+      { id: 'OCBC', name: 'OCBC Bank', category: 1, symbolSize: 20 },
+      { id: 'UOB', name: 'UOB', category: 1, symbolSize: 20 },
+      { id: 'WISE', name: 'Wise', category: 2, symbolSize: 20 },
+      { id: 'N26', name: 'N26', category: 2, symbolSize: 18 },
+      { id: 'IFAST', name: 'iFAST', category: 2, symbolSize: 18 },
+      { id: 'WECHAT', name: '微信支付', category: 3, symbolSize: 20 },
+      { id: 'ALIPAY', name: '支付宝', category: 3, symbolSize: 20 },
+      { id: 'APPLEPAY', name: 'Apple Pay', category: 3, symbolSize: 18 },
+      { id: 'COINBASE', name: 'Coinbase', category: 4, symbolSize: 24 },
+      { id: 'KRAKEN', name: 'Kraken', category: 4, symbolSize: 22 },
+      { id: 'BITGET', name: 'Bitget', category: 4, symbolSize: 20 },
+      { id: 'BINANCE', name: 'Binance', category: 4, symbolSize: 22 },
+      { id: 'OKX', name: 'OKX', category: 4, symbolSize: 20 },
+      { id: 'USDT', name: 'USDT', category: 5, symbolSize: 24 },
+      { id: 'USDC', name: 'USDC', category: 5, symbolSize: 24 },
+      { id: 'EURC', name: 'EURC', category: 5, symbolSize: 18 },
+      { id: 'DAI', name: 'DAI', category: 5, symbolSize: 18 },
+      { id: 'BTC', name: 'BTC', category: 6, symbolSize: 24 },
+      { id: 'ETH', name: 'ETH', category: 6, symbolSize: 24 },
+      { id: 'SOL', name: 'SOL', category: 6, symbolSize: 20 },
+      { id: 'XRP', name: 'XRP', category: 6, symbolSize: 20 },
+      { id: 'ETHEREUM', name: 'Ethereum', category: 7, symbolSize: 24 },
+      { id: 'TRON', name: 'Tron', category: 7, symbolSize: 20 },
+      { id: 'SOLANA', name: 'Solana', category: 7, symbolSize: 20 },
+      { id: 'BASE', name: 'Base', category: 7, symbolSize: 18 },
+      { id: 'ARBITRUM', name: 'Arbitrum', category: 7, symbolSize: 18 },
+      { id: 'OPTIMISM', name: 'Optimism', category: 7, symbolSize: 18 },
+      { id: 'AVALANCHE', name: 'Avalanche', category: 7, symbolSize: 18 },
+      { id: 'SELF_CUSTODY', name: '自托管钱包', category: 8, symbolSize: 18 },
+      { id: 'CUSTODIAL', name: '托管钱包', category: 8, symbolSize: 18 },
+      { id: 'EXCHANGE_WALLET', name: '交易所钱包', category: 8, symbolSize: 18 },
+      { id: 'METAMASK', name: 'MetaMask', category: 8, symbolSize: 18 },
+      { id: 'TRUST_WALLET', name: 'Trust Wallet', category: 8, symbolSize: 18 },
+      { id: 'LEDGER', name: 'Ledger', category: 8, symbolSize: 18 },
+      { id: 'UCARD', name: 'U卡', category: 9, symbolSize: 20 },
+      { id: 'VISA', name: 'Visa', category: 9, symbolSize: 22 },
+      { id: 'MASTERCARD', name: 'Mastercard', category: 9, symbolSize: 22 },
+      { id: 'MERCHANT', name: '全球商户', category: 10, symbolSize: 30 }
+    ],
+    links: [
+      { source: 'CMB', target: 'CNY' }, { source: 'BOC_CN', target: 'CNY' },
+      { source: 'ICBC', target: 'CNY' }, { source: 'CCB', target: 'CNY' },
+      { source: 'ABC', target: 'CNY' },
+      { source: 'HSBC_HK', target: 'HKD' }, { source: 'BOCHK', target: 'HKD' },
+      { source: 'HANGSENG', target: 'HKD' }, { source: 'SCB_HK', target: 'HKD' },
+      { source: 'HSBC_HK', target: 'USD' }, { source: 'BOCHK', target: 'USD' },
+      { source: 'HANGSENG', target: 'USD' }, { source: 'SCB_HK', target: 'USD' },
+      { source: 'BOC_MO', target: 'HKD' }, { source: 'BCM', target: 'HKD' },
+      { source: 'JPMORGAN', target: 'USD' }, { source: 'BOFA', target: 'USD' },
+      { source: 'CITI', target: 'USD' }, { source: 'WELLS_FARGO', target: 'USD' },
+      { source: 'DEUTSCHE_BANK', target: 'EUR' }, { source: 'BNP_PARIBAS', target: 'EUR' },
+      { source: 'UBS', target: 'EUR' },
+      { source: 'DBS', target: 'SGD' }, { source: 'OCBC', target: 'SGD' },
+      { source: 'UOB', target: 'SGD' },
+      { source: 'DBS', target: 'USD' }, { source: 'OCBC', target: 'USD' },
+      { source: 'UOB', target: 'USD' },
+      { source: 'CNY', target: 'HKD' }, { source: 'HKD', target: 'CNY' },
+      { source: 'CNY', target: 'USD' }, { source: 'USD', target: 'CNY' },
+      { source: 'CNY', target: 'EUR' }, { source: 'EUR', target: 'CNY' },
+      { source: 'HKD', target: 'USD' }, { source: 'USD', target: 'HKD' },
+      { source: 'HKD', target: 'EUR' }, { source: 'EUR', target: 'HKD' },
+      { source: 'USD', target: 'EUR' }, { source: 'EUR', target: 'USD' },
+      { source: 'CMB', target: 'BOCHK' }, { source: 'BOC_CN', target: 'BOCHK' },
+      { source: 'ICBC', target: 'BOCHK' }, { source: 'CCB', target: 'BOCHK' },
+      { source: 'ABC', target: 'BOCHK' },
+      { source: 'CMB', target: 'BOC_MO' }, { source: 'BOC_CN', target: 'BOC_MO' },
+      { source: 'ICBC', target: 'BOC_MO' }, { source: 'CCB', target: 'BOC_MO' },
+      { source: 'ABC', target: 'BOC_MO' },
+      { source: 'HSBC_HK', target: 'JPMORGAN' }, { source: 'BOCHK', target: 'JPMORGAN' },
+      { source: 'HANGSENG', target: 'JPMORGAN' }, { source: 'SCB_HK', target: 'JPMORGAN' },
+      { source: 'HSBC_HK', target: 'DEUTSCHE_BANK' }, { source: 'BOCHK', target: 'DEUTSCHE_BANK' },
+      { source: 'HANGSENG', target: 'DEUTSCHE_BANK' }, { source: 'SCB_HK', target: 'DEUTSCHE_BANK' },
+      { source: 'HSBC_HK', target: 'DBS' }, { source: 'BOCHK', target: 'DBS' },
+      { source: 'HANGSENG', target: 'DBS' }, { source: 'SCB_HK', target: 'DBS' },
+      { source: 'BOC_MO', target: 'BOCHK' }, { source: 'BCM', target: 'BOCHK' },
+      { source: 'HSBC_HK', target: 'WISE' }, { source: 'BOCHK', target: 'WISE' },
+      { source: 'HANGSENG', target: 'WISE' }, { source: 'SCB_HK', target: 'WISE' },
+      { source: 'JPMORGAN', target: 'WISE' }, { source: 'BOFA', target: 'WISE' },
+      { source: 'CITI', target: 'WISE' }, { source: 'WELLS_FARGO', target: 'WISE' },
+      { source: 'DBS', target: 'WISE' }, { source: 'OCBC', target: 'WISE' },
+      { source: 'UOB', target: 'WISE' },
+      { source: 'DEUTSCHE_BANK', target: 'N26' }, { source: 'BNP_PARIBAS', target: 'N26' },
+      { source: 'UBS', target: 'N26' },
+      { source: 'DBS', target: 'IFAST' }, { source: 'OCBC', target: 'IFAST' },
+      { source: 'UOB', target: 'IFAST' },
+      { source: 'CMB', target: 'WECHAT' }, { source: 'BOC_CN', target: 'WECHAT' },
+      { source: 'ICBC', target: 'WECHAT' }, { source: 'CCB', target: 'WECHAT' },
+      { source: 'ABC', target: 'WECHAT' },
+      { source: 'CMB', target: 'ALIPAY' }, { source: 'BOC_CN', target: 'ALIPAY' },
+      { source: 'ICBC', target: 'ALIPAY' }, { source: 'CCB', target: 'ALIPAY' },
+      { source: 'ABC', target: 'ALIPAY' },
+      { source: 'USD', target: 'COINBASE' }, { source: 'USD', target: 'KRAKEN' },
+      { source: 'USD', target: 'BITGET' }, { source: 'EUR', target: 'COINBASE' },
+      { source: 'EUR', target: 'KRAKEN' }, { source: 'HKD', target: 'COINBASE' },
+      { source: 'HKD', target: 'KRAKEN' },
+      { source: 'COINBASE', target: 'USDC' }, { source: 'COINBASE', target: 'BTC' },
+      { source: 'COINBASE', target: 'ETH' }, { source: 'KRAKEN', target: 'USDC' },
+      { source: 'KRAKEN', target: 'BTC' }, { source: 'KRAKEN', target: 'ETH' },
+      { source: 'USDC', target: 'ETHEREUM' }, { source: 'USDC', target: 'SOLANA' },
+      { source: 'USDC', target: 'BASE' }, { source: 'USDC', target: 'ARBITRUM' },
+      { source: 'USDC', target: 'OPTIMISM' }, { source: 'USDC', target: 'AVALANCHE' },
+      { source: 'USDT', target: 'ETHEREUM' }, { source: 'USDT', target: 'TRON' },
+      { source: 'ETHEREUM', target: 'COINBASE' }, { source: 'ETHEREUM', target: 'KRAKEN' },
+      { source: 'USDC', target: 'SELF_CUSTODY' }, { source: 'USDC', target: 'CUSTODIAL' },
+      { source: 'USDC', target: 'EXCHANGE_WALLET' }, { source: 'USDC', target: 'METAMASK' },
+      { source: 'USDC', target: 'TRUST_WALLET' }, { source: 'USDC', target: 'LEDGER' },
+      { source: 'USDT', target: 'SELF_CUSTODY' }, { source: 'USDT', target: 'CUSTODIAL' },
+      { source: 'USDT', target: 'EXCHANGE_WALLET' }, { source: 'USDT', target: 'METAMASK' },
+      { source: 'USDT', target: 'TRUST_WALLET' }, { source: 'USDT', target: 'LEDGER' },
+      { source: 'BTC', target: 'SELF_CUSTODY' }, { source: 'BTC', target: 'CUSTODIAL' },
+      { source: 'BTC', target: 'EXCHANGE_WALLET' }, { source: 'BTC', target: 'METAMASK' },
+      { source: 'BTC', target: 'TRUST_WALLET' }, { source: 'BTC', target: 'LEDGER' },
+      { source: 'ETH', target: 'SELF_CUSTODY' }, { source: 'ETH', target: 'CUSTODIAL' },
+      { source: 'ETH', target: 'EXCHANGE_WALLET' }, { source: 'ETH', target: 'METAMASK' },
+      { source: 'ETH', target: 'TRUST_WALLET' }, { source: 'ETH', target: 'LEDGER' },
+      { source: 'SELF_CUSTODY', target: 'ETHEREUM' }, { source: 'CUSTODIAL', target: 'ETHEREUM' },
+      { source: 'EXCHANGE_WALLET', target: 'ETHEREUM' }, { source: 'METAMASK', target: 'ETHEREUM' },
+      { source: 'TRUST_WALLET', target: 'ETHEREUM' }, { source: 'LEDGER', target: 'ETHEREUM' },
+      { source: 'ETHEREUM', target: 'SELF_CUSTODY' }, { source: 'ETHEREUM', target: 'CUSTODIAL' },
+      { source: 'ETHEREUM', target: 'EXCHANGE_WALLET' }, { source: 'ETHEREUM', target: 'METAMASK' },
+      { source: 'ETHEREUM', target: 'TRUST_WALLET' }, { source: 'ETHEREUM', target: 'LEDGER' },
+      { source: 'USDT', target: 'UCARD' }, { source: 'USDC', target: 'UCARD' },
+      { source: 'UCARD', target: 'VISA' }, { source: 'UCARD', target: 'MASTERCARD' },
+      { source: 'VISA', target: 'APPLEPAY' }, { source: 'MASTERCARD', target: 'APPLEPAY' },
+      { source: 'WECHAT', target: 'MERCHANT' }, { source: 'ALIPAY', target: 'MERCHANT' },
+      { source: 'VISA', target: 'MERCHANT' }, { source: 'MASTERCARD', target: 'MERCHANT' },
+      { source: 'APPLEPAY', target: 'MERCHANT' }
+    ],
+    label: { show: true, fontSize: 10, color: '#333' },
+    lineStyle: { color: 'source', width: 1, curveness: 0.05, opacity: 0.4 },
+    edgeSymbol: ['none', 'arrow'],
+    edgeSymbolSize: [0, 5],
+    emphasis: { focus: 'adjacency', lineStyle: { width: 2.5, opacity: 1 } }
+  }]
+};
+chart.setOption(option);
+window.addEventListener('resize', function() { chart.resize(); });
+</script>
+</body>
+</html>
