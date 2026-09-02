@@ -27,7 +27,7 @@ GitHub Pages 直接渲染，浏览器打开即用，无需下载。每次推送�
 | C | 卡产品商户落地 |
 | D | 片段 · 待闭环链路 |
 
-状态标记：已到账 / 片段 / 待闭环 / 未完整实测。**VERIFIED 实测链路共 34 条**，其中您实测落地的两条（稳定币 → Arbitrum One / USDT0 → Bybit、N26 EUR → Neverless → USDT0 → ether.fi → OP → Bybit）已置顶到 VERIFIED 头部。节点类型涵盖支付、卡产品、金融机构、银行、交易所、公链、经纪商等。
+状态标记：已到账 / 片段 / 待闭环 / 未完整实测。**VERIFIED 实测链路共 34 条**，其中您实测落地的两条稳定币链路（Arbitrum One / USDT0 → Bybit、N26 EUR → Neverless → USDT0 → ether.fi → OP → Bybit）以「中转」标签置顶为表格第一、二行。节点类型涵盖支付、卡产品、金融机构、银行、交易所、公链、经纪商等。
 
 > 使用方式：浏览器直接打开文件即可（纯静态单文件，无需联网）。
 
@@ -45,7 +45,7 @@ GitHub Pages 直接渲染，浏览器打开即用，无需下载。每次推送�
 
 ## 版本
 
-- V0.5 — 您实测落地的两条 NOT TESTED 链路升级为 VERIFIED 并置顶（VERIFIED 34 / FRAGMENT 2 / PENDING 2 / NOT TESTED 0）
+- V0.5.1 — 两条实测链路置顶到表格第一、二行，tag 归入「中转」
 - V0.4 — 出入金链路源稿 · Bloomberg 终端皮肤（深色、顶栏时钟 / LIVE / KPI 实时统计）
 - V0.3.1 — 主文件为出入金链路源稿（一条一行版）
 - V0.3 — 出入金链路泳道图（Bloomberg 终端风）
