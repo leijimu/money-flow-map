@@ -8,16 +8,11 @@ Open-source map of global money flows and financial infrastructure.
 
 ---
 
-## 出入金链路泳道图（Bloomberg 终端风）
+## 出入金链路图（源稿 · 一条一行）
 
-**[money-flow-map.html](https://github.com/leijimu/money-flow-map/blob/main/money-flow-map.html)** — 出入金实测链路全景泳道图，Bloomberg 终端视觉风格，单文件零外链（全内联，离线可用）。
+**[money-flow-map.html](https://github.com/leijimu/money-flow-map/blob/main/money-flow-map.html)** — 出入金实测链路数据稿「一条一行」版：38 条链路 / 112 个节点，覆盖入金到券商、稳定币出金互转、卡产品商户落地与片段待闭环链路，状态含已到账 / 片段 / 待闭环 / 未完整实测。
 
-- 112 个节点 / 38 条实测链路，覆盖支付、银行卡、金融机构、银行、交易所、公链、经纪商等渠道
-- 顶部菜单按渠道分组筛选，图表区支持通道 / 分组切换、标签显隐
-- 状态语义：绿 = 已完成、琥珀 = 部分、红 = 待办、灰 = 未实测
-- 文件顶栏含分组徽章、LIVE 指示灯、UTC+北京双时钟与 KPI
-
-> 使用方式：下载 `money-flow-map.html` 用浏览器直接打开即可，无需联网。
+> 使用方式：浏览器直接打开即可（GitHub Pages 在线预览：https://leijimu.github.io/money-flow-map/money-flow-map.html ），无需下载。
 
 ---
 
@@ -62,11 +57,10 @@ Open-source map of global money flows and financial infrastructure.
 
 ## 数据
 
-- [`data/lanes-source.html`](data/lanes-source.html) — 出入金泳道原始数据稿（38 组链路 / 112 节点）
 - [`data/nodes.md`](data/nodes.md) — 节点词典（16 类 / 64 个实体）
 - [`data/relations.md`](data/relations.md) — 关系词典（8 类资金关系）
 
 ## 版本
 
-- V0.3 — 出入金链路泳道图（Bloomberg 终端风，112 节点 / 38 链路）
-- V0.2 — 64 节点交互式总图
+- V0.3.1 — 主文件替换为出入金链路源稿（一条一行版，112 节点 / 38 链路）
+- V0.3 — 出入金链路泳道图（Bloomberg 终端风，已在 git 历史中可回溯）
