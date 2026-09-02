@@ -3,24 +3,23 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>出入金链路 · BBG 终端风</title>
+<title>出入金链路 · 观测稿 V0.7</title>
 <style>
   :root{
     --bg:#04060a; --panel:#0a1018; --panel2:#0d1520; --line:#1b2735; --line2:#22303f;
     --tx:#dbe4ee; --dim:#7f8ea3; --dim2:#55657a;
-    --amber:#ffb020; --amber2:#ff9f1a; --blue:#4da3ff; --cyan:#2dd4bf;
-    --ok:#22c55e; --frag:#ffb020; --pend:#ef4444; --no:#64748b;
+    --amber:#ffb020; --amber2:#ff9f1a; --blue:#4da3ff;
+    --ok:#22c55e; --frag:#ffb020; --pend:#ef4444; --no:#64748b; --stale:#fb7185;
     --pay:#f472b6; --card:#38bdf8; --fin:#34d399; --bank:#60a5fa;
     --ex:#fb923c; --chain:#a78bfa; --broker:#facc15;
+    --reg:#38bdf8; --plat:#34d399; --cpty:#fb7185;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
     background:var(--bg); color:var(--tx);
     font-family:"SF Mono","Cascadia Mono","Roboto Mono",ui-monospace,Menlo,Consolas,"Courier New",monospace;
-    font-size:13px; line-height:1.55;
-    -webkit-font-smoothing:antialiased;
+    font-size:13px; line-height:1.55; -webkit-font-smoothing:antialiased;
   }
-  /* ---------- top bar ---------- */
   .topbar{
     position:sticky; top:0; z-index:50;
     display:flex; align-items:center; gap:14px; flex-wrap:wrap;
@@ -28,39 +27,54 @@
   }
   .logo{color:var(--amber); font-weight:700; letter-spacing:.5px; white-space:nowrap}
   .logo b{color:var(--tx); font-weight:400}
-  .ttl{font-size:14px; font-weight:700; letter-spacing:.3px}
+  .ttl{font-size:14px; font-weight:700}
   .ttl small{color:var(--dim); font-weight:400; margin-left:8px; font-size:11px}
   .sp{flex:1}
-  .live{display:inline-flex; align-items:center; gap:6px; color:var(--ok); font-weight:700; font-size:11px}
-  .live i{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;
-    box-shadow:0 0 8px var(--ok); animation:pulse 1.6s infinite}
+  .live{display:inline-flex;align-items:center;gap:6px;color:var(--dim);font-weight:700;font-size:11px}
+  .live i{width:8px;height:8px;border-radius:50%;background:var(--dim2);display:inline-block}
+  .live.on{color:var(--ok)}
+  .live.on i{background:var(--ok);box-shadow:0 0 8px var(--ok);animation:pulse 1.6s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
   .clk{font-size:11px;color:var(--dim);text-align:right;line-height:1.4;white-space:nowrap}
   .clk b{color:var(--tx);font-weight:600}
-  /* ---------- kpi strip ---------- */
+  .banner{
+    margin:12px 16px 0; padding:10px 14px; border:1px solid rgba(239,68,68,.45);
+    background:rgba(239,68,68,.08); color:#fecaca; font-size:12px; line-height:1.7; border-radius:4px;
+    max-width:1600px;
+  }
+  .banner strong{color:#fff}
   .kpis{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--line);background:var(--panel)}
-  .kpi{flex:1;min-width:120px;padding:8px 16px;border-right:1px solid var(--line)}
+  .kpi{flex:1;min-width:110px;padding:8px 16px;border-right:1px solid var(--line);cursor:pointer;user-select:none}
   .kpi:last-child{border-right:0}
+  .kpi:hover,.kpi.active{background:#101826}
   .kpi small{display:block;color:var(--dim);font-size:10px;letter-spacing:.8px;text-transform:uppercase}
   .kpi b{font-size:20px;font-weight:700;line-height:1.2}
   .kpi.ok b{color:var(--ok)} .kpi.frag b{color:var(--frag)}
-  .kpi.pend b{color:var(--pend)} .kpi.no b{color:var(--no)}
-  .kpi.total b{color:var(--tx)}
-  /* ---------- sub + legend ---------- */
-  .subwrap{padding:14px 16px 4px;max-width:1600px;margin:0 auto}
+  .kpi.pend b{color:var(--pend)} .kpi.no b{color:var(--no)} .kpi.stale b{color:var(--stale)}
+  .subwrap{padding:14px 16px 8px;max-width:1600px;margin:0 auto}
   .sub{color:var(--dim);font-size:12px;line-height:1.8}
-  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:10px 0 2px;font-size:11px;color:var(--dim)}
-  .chip{display:inline-flex;align-items:center;gap:6px;font-family:inherit}
-  .chip b{color:var(--tx);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin:10px 0 0;font-size:11px;color:var(--dim)}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-family:inherit;cursor:pointer;border:1px solid transparent;padding:2px 6px;border-radius:3px}
+  .chip:hover,.chip.active{border-color:var(--line2);background:#0d1520;color:var(--tx)}
   .d{width:9px;height:9px;border-radius:2px;display:inline-block}
   .d.pay{background:var(--pay)} .d.card{background:var(--card)} .d.fin{background:var(--fin)}
   .d.bank{background:var(--bank)} .d.ex{background:var(--ex)} .d.chain{background:var(--chain)}
   .d.broker{background:var(--broker)}
   .d.ok{background:var(--ok)} .d.frag{background:var(--frag)}
-  .d.pend{background:var(--pend)} .d.no{background:var(--no)}
+  .d.pend{background:var(--pend)} .d.no{background:var(--no)} .d.stale{background:var(--stale)}
+  .d.reg{background:var(--reg)} .d.plat{background:var(--plat)} .d.cpty{background:var(--cpty)}
   .legend .sep{border-left:1px solid var(--line2);margin:0 2px}
-  /* ---------- groups ---------- */
-  .wrap{max-width:1600px;margin:0 auto;padding:12px 16px 20px}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+  .filters input,.filters select{
+    background:#05080d;color:var(--tx);border:1px solid var(--line2);padding:6px 8px;border-radius:3px;font:inherit;font-size:12px;
+  }
+  .filters input{min-width:220px;flex:1}
+  .btn{
+    background:#101826;color:var(--tx);border:1px solid var(--line2);padding:6px 10px;border-radius:3px;
+    font:inherit;font-size:12px;cursor:pointer;
+  }
+  .btn:hover,.btn.active{border-color:var(--amber);color:var(--amber)}
+  .wrap{max-width:1600px;margin:0 auto;padding:8px 16px 20px}
   .group{background:var(--panel);border:1px solid var(--line);margin:0 0 14px;border-radius:4px;overflow:hidden}
   .ghead{
     display:flex;justify-content:space-between;align-items:center;gap:10px;
@@ -69,31 +83,27 @@
   }
   .ghead small{font-weight:400;color:var(--dim);font-size:10px;letter-spacing:0}
   .ghead.ok{color:var(--ok)} .ghead.frag{color:var(--frag)}
-  .ghead.pend{color:var(--pend)} .ghead.no{color:var(--no)}
-  .row{
-    display:grid;grid-template-columns:44px 100px 84px 1fr;gap:10px;
-    padding:8px 12px;border-bottom:1px solid var(--line);align-items:center;
-  }
+  .ghead.pend{color:var(--pend)} .ghead.stale{color:var(--stale)}
+  .row{padding:10px 12px;border-bottom:1px solid var(--line)}
   .row:nth-child(even){background:#09101a}
   .row:last-child{border-bottom:0}
-  .num{
-    font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--dim2);
-    text-align:center;font-variant-numeric:tabular-nums;user-select:none;
-  }
-  .st{
-    font-size:10px;font-weight:700;text-align:center;letter-spacing:.5px;
-    padding:3px 0;border-radius:2px;border:1px solid;white-space:nowrap;
-  }
+  .row.rail-cpty{box-shadow:inset 3px 0 0 var(--cpty)}
+  .row.rail-reg{box-shadow:inset 3px 0 0 var(--reg)}
+  .row.rail-plat{box-shadow:inset 3px 0 0 var(--plat)}
+  .row-main{display:grid;grid-template-columns:44px 118px 88px 1fr;gap:10px;align-items:center}
+  .num{font-size:11px;font-weight:600;color:var(--dim2);text-align:center;font-variant-numeric:tabular-nums}
+  .st{font-size:10px;font-weight:700;text-align:center;letter-spacing:.4px;padding:3px 4px;border-radius:2px;border:1px solid;white-space:nowrap}
   .st.ok{color:var(--ok);border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.08)}
   .st.frag{color:var(--frag);border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.08)}
   .st.pend{color:var(--pend);border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.08)}
-  .st.no{color:var(--no);border-color:rgba(100,116,139,.4);background:rgba(100,116,139,.07)}
-  .tag{font-size:10px;color:var(--dim2);letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .st.stale{color:var(--stale);border-color:rgba(251,113,133,.45);background:rgba(251,113,133,.08)}
+  .tag{font-size:10px;color:var(--dim2)}
   .flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
   .box{
     padding:4px 8px;border-radius:3px;border:1px solid;font-size:12px;line-height:1.35;text-align:center;
-    background:#05080d;white-space:nowrap;
+    background:#05080d;white-space:nowrap;cursor:pointer;
   }
+  .box:hover{filter:brightness(1.2)}
   .box b{display:block;font-weight:700}
   .box i{display:block;font-style:normal;font-size:10px;opacity:.75;color:var(--dim)}
   .box.pay{border-color:var(--pay);color:#fbcfe8}
@@ -105,313 +115,511 @@
   .box.broker{border-color:var(--broker);color:#fef9c3}
   .arr{color:var(--dim);font-weight:700;font-size:14px}
   .arr.dim{color:#33435a;font-weight:400}
-  footer{
-    max-width:1600px;margin:0 auto;padding:2px 16px 32px;
-    font-size:11px;color:var(--dim2);line-height:1.8;
+  .meta{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px 16px;
+    margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:11px;color:var(--dim);
   }
+  .meta b{color:var(--tx);font-weight:600}
+  .meta a{color:var(--blue);text-decoration:none}
+  .meta a:hover{text-decoration:underline}
+  #graphWrap{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:14px}
+  #graph{width:100%;height:520px;display:block;cursor:grab}
+  .empty{padding:24px;color:var(--dim);text-align:center}
+  footer{max-width:1600px;margin:0 auto;padding:2px 16px 32px;font-size:11px;color:var(--dim2);line-height:1.8}
   footer .k{color:var(--dim)}
-  footer .x{
-    display:inline-flex;align-items:center;gap:6px;margin-left:14px;
-    color:#9db4cc;text-decoration:none;font-weight:700;letter-spacing:.3px;
-  }
+  footer .x{display:inline-flex;align-items:center;gap:6px;margin-left:14px;color:#9db4cc;text-decoration:none;font-weight:700}
   footer .x:hover{color:#1d9bf0}
   footer .x svg{width:13px;height:13px;fill:currentColor}
-  /* ---------- mobile ---------- */
-  @media (max-width:760px){
-    body{font-size:12px}
-    .row{grid-template-columns:auto 1fr;gap:4px 10px;padding:8px 10px;align-items:start}
-    .num{grid-column:1;grid-row:1/4;text-align:left;padding-top:2px}
-    .st{grid-column:2;grid-row:1;width:auto}
-    .tag{grid-column:2;grid-row:2;padding-left:2px}
-    .flow{grid-column:2;grid-row:3}
-    .kpi b{font-size:17px}
-    .topbar{gap:8px}
+  @media (max-width:860px){
+    .row-main{grid-template-columns:auto 1fr;gap:4px 10px}
+    .num{grid-column:1;grid-row:1/3}
+    .st{grid-column:2;width:max-content}
+    .tag{grid-column:2}
+    .flow{grid-column:1/-1;overflow-x:auto;flex-wrap:nowrap;padding-bottom:6px}
+    .filters input{min-width:0;width:100%}
+    #graph{height:380px}
   }
 </style>
 </head>
 <body>
   <div class="topbar">
     <span class="logo">喜蜘蛛&nbsp;<b>· 出入金链路图 · Money Flow Map</b></span>
-    <span class="ttl">出入金链路 · 一条一行<small>DEPOSIT / WITHDRAW / CARD ROUTES</small></span>
+    <span class="ttl">观测稿 V0.7<small>LIST + GRAPH · NOT ADVICE</small></span>
     <span class="sp"></span>
-    <span class="live"><i></i>LIVE</span>
-    <span class="clk">UTC&nbsp;<b id="cUtc">--:--:--</b><br/>北京&nbsp;<b id="cBj">--:--:--</b></span>
+    <span class="live" id="liveLamp"><i></i>CLOCK</span>
+    <span class="clk">UTC <b id="cUtc">--:--:--</b><br/>北京 <b id="cBj">--:--:--</b></span>
+  </div>
+
+  <div class="banner">
+    <strong>产品边界：</strong>本页是公开信息的整理与可视化，不是转账、换汇、出入金或避税指南。
+    监管轨道、平台内轨道与对手方轨道的可靠性不可等同。
+    C2C、商户码回流等路径失效更快、争议更多，仅作观测记录。
+    请自行核验身份要求、税务与所在地法律。数据截至 <b id="asOfTop">—</b>；时钟走动不等于链路仍有效。
   </div>
 
   <div class="kpis">
-    <div class="kpi total"><small>TOTAL ROUTES</small><b id="kTotal">38</b></div>
-    <div class="kpi ok"><small>VERIFIED</small><b id="kOk">0</b></div>
-    <div class="kpi frag"><small>PARTIAL</small><b id="kFrag">0</b></div>
-    <div class="kpi pend"><small>PENDING</small><b id="kPend">0</b></div>
-    <div class="kpi no"><small>NOT TESTED</small><b id="kNo">0</b></div>
+    <div class="kpi total" data-status=""><small>VISIBLE</small><b id="kTotal">0</b></div>
+    <div class="kpi ok" data-status="OBSERVED"><small>OBSERVED</small><b id="kOk">0</b></div>
+    <div class="kpi frag" data-status="PARTIAL"><small>PARTIAL</small><b id="kFrag">0</b></div>
+    <div class="kpi pend" data-status="PENDING"><small>PENDING</small><b id="kPend">0</b></div>
+    <div class="kpi stale" data-status="STALE"><small>STALE</small><b id="kStale">0</b></div>
   </div>
 
   <div class="subwrap">
-    <p class="sub">一条链路占一行，按状态分组：VERIFIED 已实测 / PARTIAL 部分闭环 / PENDING 待闭环 / NOT TESTED 未实测。行内节点按 A → B → C 顺序排列。实线箭头 = 可实测闭环；虚线 ⇢ = 片段 / 待闭环。仅收录公开帖文中出现过的跳转，不构成操作或投资建议。</p>
-    <div class="legend">
-      <span class="chip"><span class="d pay"></span><b>支付 / 商户</b></span>
-      <span class="chip"><span class="d card"></span><b>卡 / 钱包</b></span>
-      <span class="chip"><span class="d fin"></span><b>金融服务</b></span>
-      <span class="chip"><span class="d bank"></span><b>银行</b></span>
-      <span class="chip"><span class="d ex"></span><b>交易所</b></span>
-      <span class="chip"><span class="d chain"></span><b>链 / 稳定币</b></span>
-      <span class="chip"><span class="d broker"></span><b>券商</b></span>
-      <span class="sep"></span>
-      <span class="chip"><span class="d ok"></span>VERIFIED</span>
-      <span class="chip"><span class="d frag"></span>PARTIAL</span>
-      <span class="chip"><span class="d pend"></span>PENDING</span>
-      <span class="chip"><span class="d no"></span>NOT TESTED</span>
+    <p class="sub">状态为带日期的观测，不是永久认证。超过 <span id="staleDays">60</span> 天未复核自动降为 STALE。实线 = 目录中记为闭环；虚线 = 片段。点节点、图例或 KPI 可筛选。</p>
+    <div class="legend" id="legend"></div>
+    <div class="filters">
+      <input id="q" placeholder="搜索节点 / 用途 / 币种 / 备注" />
+      <select id="purpose"><option value="">全部用途</option></select>
+      <select id="ccy"><option value="">全部币种</option></select>
+      <select id="rail"><option value="">全部轨道</option>
+        <option value="regulated">监管轨道</option>
+        <option value="platform">平台内轨道</option>
+        <option value="counterparty">对手方轨道</option>
+      </select>
+      <button class="btn active" id="btnList" type="button">清单</button>
+      <button class="btn" id="btnGraph" type="button">网络图</button>
+      <button class="btn" id="btnReset" type="button">清除筛选</button>
     </div>
   </div>
 
   <div class="wrap">
-    <section class="group">
-      <div class="ghead ok">VERIFIED <small>34 ROUTES · ONE ROW ONE LANE</small></div>
-      <div class="row"><span class="num">01</span><div class="st ok">VERIFIED</div><div class="tag">中转</div><div class="flow">
-        <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
-        <div class="box chain"><b>Arbitrum One</b><i>USDT0</i></div><span class="arr">→</span>
-        <div class="box ex"><b>Bybit</b></div>
-      </div></div>
-      <div class="row"><span class="num">02</span><div class="st ok">VERIFIED</div><div class="tag">中转</div><div class="flow">
-        <div class="box bank"><b>N26</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
-        <div class="box chain"><b>Arbitrum One</b><i>USDT0</i></div><span class="arr">→</span>
-        <div class="box card"><b>ether.fi</b></div><span class="arr">→</span>
-        <div class="box chain"><b>OP Mainnet</b></div><span class="arr">→</span>
-        <div class="box ex"><b>Bybit</b></div>
-      </div></div>
-      <div class="row"><span class="num">03</span><div class="st ok">VERIFIED</div><div class="tag">OKX入所</div><div class="flow">
-        <div class="box pay"><b>支付宝</b><i>CNY</i></div><span class="arr">→</span>
-        <div class="box ex"><b>OKX C2C</b><i>买 USDT</i></div><span class="arr">→</span>
-        <div class="box ex"><b>OKX</b><i>USDT</i></div><span class="arr">→</span>
-        <div class="box chain"><b>Arbitrum One</b><i>USDT</i></div><span class="arr">→</span>
-        <div class="box fin"><b>Neverless</b></div>
-      </div></div>
-      <div class="row"><span class="num">04</span><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
-        <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box bank"><b>N26</b><i>EUR · SEPA</i></div><span class="arr">→</span>
-        <div class="box broker"><b>IBKR</b></div>
-      </div></div>
-      <div class="row"><span class="num">05</span><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
-        <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box fin"><b>Wise</b></div>
-      </div></div>
-      <div class="row"><span class="num">06</span><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
-        <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box fin"><b>Fiat24</b><i>EUR</i></div>
-      </div></div>
-      <div class="row"><span class="num">07</span><div class="st ok">VERIFIED</div><div class="tag">中转</div><div class="flow">
-        <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box bank"><b>iFAST</b></div>
-      </div></div>
-      <div class="row"><span class="num">08</span><div class="st ok">VERIFIED</div><div class="tag">直达券商</div><div class="flow">
-        <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box broker"><b>IBKR</b></div>
-      </div></div>
-      <div class="row"><span class="num">09</span><div class="st ok">VERIFIED</div><div class="tag">直达券商</div><div class="flow">
-        <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box broker"><b>嘉信理财</b></div>
-      </div></div>
-      <div class="row"><span class="num">10</span><div class="st ok">VERIFIED</div><div class="tag">组合链</div><div class="flow">
-        <div class="box ex"><b>币安</b><i>USDT / USDC</i></div><span class="arr">→</span>
-        <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box bank"><b>iFAST</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Wise</b><i>EUR / HKD</i></div>
-      </div></div>
-      <div class="row"><span class="num">11</span><div class="st ok">VERIFIED</div><div class="tag">钱包中转</div><div class="flow">
-        <div class="box pay"><b>C2C</b><i>USDC</i></div><span class="arr">→</span>
-        <div class="box card"><b>SafePal</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Fiat24</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box bank"><b>N26</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box broker"><b>IBKR</b></div>
-      </div></div>
-      <div class="row"><span class="num">12</span><div class="st ok">VERIFIED</div><div class="tag">港卡</div><div class="flow">
-        <div class="box bank"><b>港卡</b><i>HKD</i></div><span class="arr">→</span>
-        <div class="box pay"><b>FPS</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Wise</b><i>USD</i></div><span class="arr">→</span>
-        <div class="box broker"><b>IBKR</b></div>
-      </div></div>
-      <div class="row"><span class="num">13</span><div class="st ok">VERIFIED</div><div class="tag">ACH</div><div class="flow">
-        <div class="box fin"><b>Wise</b><i>USD Checking</i></div><span class="arr">→</span>
-        <div class="box bank"><b>ACH</b></div><span class="arr">→</span>
-        <div class="box broker"><b>嘉信理财</b></div>
-      </div></div>
-      <div class="row"><span class="num">14</span><div class="st ok">VERIFIED</div><div class="tag">新加坡户</div><div class="flow">
-        <div class="box fin"><b>Starryblu</b><i>同名账户</i></div><span class="arr">→</span>
-        <div class="box broker"><b>IBKR</b></div>
-      </div></div>
-      <div class="row"><span class="num">15</span><div class="st ok">VERIFIED</div><div class="tag">稳定币直买</div><div class="flow">
-        <div class="box chain"><b>USDT / USDC</b></div><span class="arr">→</span>
-        <div class="box ex"><b>BIT</b></div><span class="arr">→</span>
-        <div class="box broker"><b>美股正股</b></div>
-      </div></div>
-      <div class="row"><span class="num">16</span><div class="st ok">VERIFIED</div><div class="tag">平台内持仓</div><div class="flow">
-        <div class="box chain"><b>USDT / EUR / USD</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
-        <div class="box broker"><b>美股 / ETF</b></div>
-      </div></div>
-      <div class="row"><span class="num">17</span><div class="st ok">VERIFIED</div><div class="tag">法币直入</div><div class="flow">
-        <div class="box pay"><b>Apple Pay</b><i>USD / EUR</i></div><span class="arr">→</span>
-        <div class="box fin"><b>Neverless</b></div>
-      </div></div>
-      <div class="row"><span class="num">18</span><div class="st ok">VERIFIED</div><div class="tag">互转</div><div class="flow">
-        <div class="box fin"><b>Wise</b></div><span class="arr">→</span>
-        <div class="box ex"><b>Kraken</b><i>个人账户</i></div>
-      </div></div>
-      <div class="row"><span class="num">19</span><div class="st ok">VERIFIED</div><div class="tag">互转</div><div class="flow">
-        <div class="box ex"><b>Kraken</b><i>个人账户</i></div><span class="arr">→</span>
-        <div class="box fin"><b>Wise</b></div>
-      </div></div>
-      <div class="row"><span class="num">20</span><div class="st ok">VERIFIED</div><div class="tag">回流</div><div class="flow">
-        <div class="box chain"><b>USDC</b></div><span class="arr">→</span>
-        <div class="box ex"><b>Backpack</b><i>USD</i></div><span class="arr">→</span>
-        <div class="box bank"><b>大象银行</b><i>USD</i></div><span class="arr">→</span>
-        <div class="box pay"><b>微信</b></div><span class="arr">→</span>
-        <div class="box bank"><b>境内银行卡</b><i>CNY</i></div>
-      </div></div>
-      <div class="row"><span class="num">21</span><div class="st ok">VERIFIED</div><div class="tag">C2C</div><div class="flow">
-        <div class="box ex"><b>币安 / OKX / HTX</b><i>C2C</i></div><span class="arr">→</span>
-        <div class="box bank"><b>境内银行卡</b><i>CNY</i></div>
-      </div></div>
-      <div class="row"><span class="num">22</span><div class="st ok">VERIFIED</div><div class="tag">汇出</div><div class="flow">
-        <div class="box ex"><b>交易所</b><i>USDT 等</i></div><span class="arr">→</span>
-        <div class="box fin"><b>Biyapay</b><i>USD</i></div><span class="arr">→</span>
-        <div class="box bank"><b>自有境外账户</b></div>
-      </div></div>
-      <div class="row"><span class="num">23</span><div class="st ok">VERIFIED</div><div class="tag">1:1</div><div class="flow">
-        <div class="box chain"><b>USDC</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Fluidkey</b><i>ACH</i></div><span class="arr">→</span>
-        <div class="box bank"><b>USD</b></div>
-      </div></div>
-      <div class="row"><span class="num">24</span><div class="st ok">VERIFIED</div><div class="tag">1:1</div><div class="flow">
-        <div class="box bank"><b>USD</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Fluidkey</b><i>ACH</i></div><span class="arr">→</span>
-        <div class="box chain"><b>USDC</b></div>
-      </div></div>
-      <div class="row"><span class="num">25</span><div class="st ok">VERIFIED</div><div class="tag">备选入金</div><div class="flow">
-        <div class="box chain"><b>USDC</b></div><span class="arr">→</span>
-        <div class="box chain"><b>Avalanche C-Chain</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Neverless</b></div>
-      </div></div>
-      <div class="row"><span class="num">26</span><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
-        <div class="box chain"><b>USDT</b></div><span class="arr">→</span>
-        <div class="box ex"><b>Gate</b></div><span class="arr">→</span>
-        <div class="box card"><b>Gate U卡</b><i>USD</i></div><span class="arr">→</span>
-        <div class="box pay"><b>支付宝</b></div>
-      </div></div>
-      <div class="row"><span class="num">27</span><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
-        <div class="box card"><b>Gate U卡</b></div><span class="arr">→</span>
-        <div class="box pay"><b>美团</b></div>
-      </div></div>
-      <div class="row"><span class="num">28</span><div class="st ok">VERIFIED</div><div class="tag">小额回款</div><div class="flow">
-        <div class="box card"><b>Gate U卡</b></div><span class="arr">→</span>
-        <div class="box pay"><b>支付宝商户码</b><i>CNY 小额</i></div><span class="arr">→</span>
-        <div class="box bank"><b>商户银行卡</b></div>
-      </div></div>
-      <div class="row"><span class="num">29</span><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
-        <div class="box chain"><b>USDT</b></div><span class="arr">→</span>
-        <div class="box ex"><b>Bybit 现货</b><i>兑 USD</i></div><span class="arr">→</span>
-        <div class="box card"><b>Bybit U卡</b></div><span class="arr">→</span>
-        <div class="box pay"><b>消费</b></div>
-      </div></div>
-      <div class="row"><span class="num">30</span><div class="st ok">VERIFIED</div><div class="tag">Visa</div><div class="flow">
-        <div class="box fin"><b>Starryblu</b></div><span class="arr">→</span>
-        <div class="box card"><b>Starryblu Visa</b></div><span class="arr">→</span>
-        <div class="box pay"><b>ChatGPT / Claude</b></div>
-      </div></div>
-      <div class="row"><span class="num">31</span><div class="st ok">VERIFIED</div><div class="tag">扫码</div><div class="flow">
-        <div class="box fin"><b>Starryblu</b></div><span class="arr">→</span>
-        <div class="box pay"><b>微信 / 支付宝</b></div>
-      </div></div>
-      <div class="row"><span class="num">32</span><div class="st ok">VERIFIED</div><div class="tag">钱包支付</div><div class="flow">
-        <div class="box pay"><b>TenPayGo</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Starryblu 钱包</b></div>
-      </div></div>
-      <div class="row"><span class="num">33</span><div class="st ok">VERIFIED</div><div class="tag">绑卡</div><div class="flow">
-        <div class="box fin"><b>Fiat24</b></div><span class="arr">→</span>
-        <div class="box card"><b>Mastercard</b></div><span class="arr">→</span>
-        <div class="box pay"><b>微信 / 支付宝 / Apple Pay</b></div>
-      </div></div>
-      <div class="row"><span class="num">34</span><div class="st ok">VERIFIED</div><div class="tag">消费</div><div class="flow">
-        <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
-        <div class="box bank"><b>N26</b></div><span class="arr">→</span>
-        <div class="box pay"><b>日常消费 / AI 订阅</b></div>
-      </div></div>
-    </section>
-
-    <section class="group">
-      <div class="ghead frag">PARTIAL <small>2 ROUTES · ONE ROW ONE LANE</small></div>
-      <div class="row"><span class="num">35</span><div class="st frag">PARTIAL</div><div class="tag">形态</div><div class="flow">
-        <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Fiat24</b><i>到账 USDT0</i></div>
-      </div></div>
-      <div class="row"><span class="num">36</span><div class="st frag">PARTIAL</div><div class="tag">建议链</div><div class="flow">
-        <div class="box bank"><b>iFAST</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Fiat24</b></div><span class="arr">→</span>
-        <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
-        <div class="box ex"><b>Kraken</b></div>
-      </div></div>
-    </section>
-
-    <section class="group">
-      <div class="ghead pend">PENDING <small>2 ROUTES · ONE ROW ONE LANE</small></div>
-      <div class="row"><span class="num">37</span><div class="st pend">PENDING</div><div class="tag">EUR IBAN</div><div class="flow">
-        <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr dim">⇢</span>
-        <div class="box fin"><b>Starryblu</b><i>EUR IBAN</i></div>
-      </div></div>
-      <div class="row"><span class="num">38</span><div class="st pend">PENDING</div><div class="tag">EUR IBAN</div><div class="flow">
-        <div class="box fin"><b>Starryblu</b><i>EUR IBAN</i></div><span class="arr dim">⇢</span>
-        <div class="box bank"><b>N26</b></div>
-      </div></div>
-    </section>
+    <div id="graphWrap" hidden>
+      <canvas id="graph"></canvas>
+    </div>
+    <div id="list"></div>
   </div>
 
   <footer>
-    <span class="k">DATA AS OF</span> 2026-09-03 · 通道、网络与风控会变动，使用前以各平台当前页面为准 · 仅整理公开信息，不构成操作或投资建议
-    <a class="x" href="https://x.com/sanguniao" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-      @sanguniao
-    </a>
-    <a class="x" href="https://github.com/leijimu/money-flow-map" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.73.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.14c0 .3.21.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
-      GitHub
-    </a>
+    <span class="k">DATA AS OF</span> <span id="asOfFoot">—</span>
+    · 仅整理公开信息，不构成操作或投资建议
+    <a class="x" href="https://github.com/leijimu/money-flow-map" target="_blank" rel="noopener">GitHub 原仓库</a>
   </footer>
-
 <script>
-  (function(){
-    /* KPI: count statuses from the DOM itself (single source = rows) */
-    function countKpi(){
-      var rows=document.querySelectorAll('.row');
-      var n={ok:0,frag:0,pend:0,no:0};
-      rows.forEach(function(r){
-        var st=r.querySelector('.st');
-        if(!st)return;
-        if(st.classList.contains('ok'))n.ok++;
-        else if(st.classList.contains('frag'))n.frag++;
-        else if(st.classList.contains('pend'))n.pend++;
-        else if(st.classList.contains('no'))n.no++;
-      });
-      document.getElementById('kTotal').textContent=rows.length;
-      document.getElementById('kOk').textContent=n.ok;
-      document.getElementById('kFrag').textContent=n.frag;
-      document.getElementById('kPend').textContent=n.pend;
-      document.getElementById('kNo').textContent=n.no;
+const N = (id,name,type,ccy)=>({id,name,type,ccy});
+const DATA = {
+  version: "0.7.0",
+  dataAsOf: "2026-09-03",
+  staleAfterDays: 60,
+  routes: []
+};
+
+function R(o){ DATA.routes.push(o); }
+function nodes(){ return Array.from(arguments); }
+
+R({id:"01",raw:"OBSERVED",purpose:"中转",rail:"platform",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"链上费 + 平台点差（未报价）",latency:"链上确认级",limit:"以平台当日限额为准",
+  compliance:"平台 KYC；稳定币出金规则会变",
+  currencies:["USDT"], version:"2026-09-03.catalog",
+  hops:[N("neverless","Neverless","fin",""),N("arb","Arbitrum One","chain","USDT0"),N("bybit","Bybit","ex","")]});
+R({id:"02",raw:"OBSERVED",purpose:"中转",rail:"platform",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"SEPA/链上/协议费未拆分",latency:"银行日 + 链上确认",limit:"未标注",
+  compliance:"N26 与协议层各自 KYC",
+  currencies:["EUR","USDT"], version:"2026-09-03.catalog",
+  hops:[N("n26","N26","bank","EUR"),N("neverless","Neverless","fin",""),N("arb","Arbitrum One","chain","USDT0"),N("etherfi","ether.fi","card",""),N("op","OP Mainnet","chain",""),N("bybit","Bybit","ex","")]});
+R({id:"03",raw:"OBSERVED",purpose:"入金",rail:"counterparty",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"C2C 点差为主",latency:"对手方确认",limit:"小额更常见；大额易触发审核",
+  compliance:"对手方轨道。依赖个人卖家，争议与封禁风险高于银行轨道。不视为与 SEPA/ACH 同等可靠。",
+  currencies:["CNY","USDT"], version:"2026-09-03.catalog",
+  hops:[N("alipay","Alipay","pay","CNY"),N("okx-c2c","OKX C2C","ex","买 USDT"),N("okx","OKX","ex","USDT"),N("arb","Arbitrum One","chain","USDT"),N("neverless","Neverless","fin","")]});
+R({id:"04",raw:"OBSERVED",purpose:"换汇/券商入金",rail:"regulated",lastChecked:"2026-09-03",amount:"中额",result:"目录记为通过",
+  cost:"SEPA 通常低费率",latency:"T+0 至 T+1",limit:"同名账户更稳妥",
+  compliance:"监管轨道：SEPA + 券商入金。需同名与券商收款规则。",
+  currencies:["EUR"], version:"2026-09-03.catalog",
+  hops:[N("neverless","Neverless","fin","EUR"),N("n26","N26","bank","EUR · SEPA"),N("ibkr","IBKR","broker","")]});
+R({id:"05",raw:"OBSERVED",purpose:"换汇",rail:"regulated",lastChecked:"2026-08-31",amount:"小额",result:"目录记为通过",
+  cost:"Wise 计价差；见 2026-08-31 港币入账被扣 10 HKD 的相邻观测",latency:"通常当日",limit:"以 Wise 资料为准",
+  compliance:"持牌换汇机构。",
+  currencies:["EUR"], version:"2026-09-03.catalog",
+  hops:[N("neverless","Neverless","fin","EUR"),N("wise","Wise","fin","")]});
+R({id:"06",raw:"OBSERVED",purpose:"换汇",rail:"platform",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"未报价",latency:"未标注",limit:"未标注",
+  compliance:"平台账户规则。",
+  currencies:["EUR"], version:"2026-09-03.catalog",
+  hops:[N("neverless","Neverless","fin","EUR"),N("fiat24","Fiat24","fin","EUR")]});
+R({id:"07",raw:"OBSERVED",purpose:"中转",rail:"regulated",lastChecked:"2026-08-31",amount:"中额",result:"目录记为通过；作者同日询问反向小额费用",
+  cost:"作者观测：Neverless 提示最低约 600 USD；iFAST 侧或见约 10 USD 费用（2026-08-31 帖，非报价）",latency:"T+1 量级",limit:"小额可能不经济",
+  compliance:"持牌金融账户，注意最低额。",
+  currencies:["EUR","USD"], version:"2026-09-03.catalog",
+  hops:[N("neverless","Neverless","fin","EUR"),N("ifast","iFAST","bank","")]});
+R({id:"08",raw:"OBSERVED",purpose:"券商入金",rail:"regulated",lastChecked:"2026-09-03",amount:"中额",result:"目录记为通过",
+  cost:"银行/平台出金费未拆分",latency:"券商入账周期",limit:"同名",
+  compliance:"券商入金审核。",
+  currencies:["EUR"], version:"2026-09-03.catalog",
+  hops:[N("neverless","Neverless","fin","EUR"),N("ibkr","IBKR","broker","")]});
+R({id:"09",raw:"OBSERVED",purpose:"券商入金",rail:"regulated",lastChecked:"2026-09-03",amount:"中额",result:"目录记为通过",
+  cost:"未报价",latency:"券商入账周期",limit:"同名",
+  compliance:"券商入金审核。",
+  currencies:["EUR"], version:"2026-09-03.catalog",
+  hops:[N("neverless","Neverless","fin","EUR"),N("schwab","Charles Schwab","broker","")]});
+R({id:"10",raw:"OBSERVED",purpose:"组合链",rail:"platform",lastChecked:"2026-09-03",amount:"中额",result:"目录记为通过",
+  cost:"兑换点差叠加",latency:"多跳",limit:"各段限额取最严",
+  compliance:"交易所出金 + 持牌账户。",
+  currencies:["USDT","USDC","EUR","HKD"], version:"2026-09-03.catalog",
+  hops:[N("binance","Binance","ex","USDT / USDC"),N("neverless","Neverless","fin","EUR"),N("ifast","iFAST","bank",""),N("wise","Wise","fin","EUR / HKD")]});
+R({id:"11",raw:"OBSERVED",purpose:"钱包中转",rail:"counterparty",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"C2C 点差 + 链上费",latency:"对手方 + 银行",limit:"小额",
+  compliance:"首段为对手方轨道。",
+  currencies:["USDC","EUR"], version:"2026-09-03.catalog",
+  hops:[N("c2c","C2C","pay","USDC"),N("safepal","SafePal","card",""),N("fiat24","Fiat24","fin","EUR"),N("n26","N26","bank","EUR"),N("ibkr","IBKR","broker","")]});
+R({id:"12",raw:"OBSERVED",purpose:"港卡/券商入金",rail:"regulated",lastChecked:"2026-08-31",amount:"小额",result:"目录记为通过",
+  cost:"FPS 通常低费；Wise 入账或有固定扣费（见 10 HKD 观测）",latency:"当日到 T+1",limit:"银行卡与 Wise 资料",
+  compliance:"香港本地支付轨道 + 持牌换汇 + 券商。",
+  currencies:["HKD","USD"], version:"2026-09-03.catalog",
+  hops:[N("hkcard","HK Card","bank","HKD"),N("fps","FPS","pay",""),N("wise","Wise","fin","USD"),N("ibkr","IBKR","broker","")]});
+R({id:"13",raw:"OBSERVED",purpose:"券商入金",rail:"regulated",lastChecked:"2026-09-03",amount:"中额",result:"目录记为通过",
+  cost:"ACH 通常低费",latency:"T+1 至 T+3",limit:"Wise 美元账户能力",
+  compliance:"ACH 入券商，同名。",
+  currencies:["USD"], version:"2026-09-03.catalog",
+  hops:[N("wise","Wise","fin","USD Checking"),N("ach","ACH","bank",""),N("schwab","Charles Schwab","broker","")]});
+R({id:"14",raw:"OBSERVED",purpose:"新加坡户/券商入金",rail:"regulated",lastChecked:"2026-08-09",amount:"未标注",result:"目录记为通过；2026-08-09 作者称 Starryblu 仍在排队",
+  cost:"未报价",latency:"开户周期可能长",limit:"同名账户",
+  compliance:"开户审核未完成前不可当作已开通。",
+  currencies:["SGD","USD"], version:"2026-09-03.catalog",
+  hops:[N("starryblu","Starryblu","fin","同名账户"),N("ibkr","IBKR","broker","")]});
+R({id:"15",raw:"OBSERVED",purpose:"稳定币直买",rail:"platform",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"交易点差",latency:"平台内",limit:"产品与地区限制",
+  compliance:"平台证券/合约资格因地区而异。",
+  currencies:["USDT","USDC","USD"], version:"2026-09-03.catalog",
+  hops:[N("usdt-usdc","USDT / USDC","chain",""),N("bit","BIT","ex",""),N("us-eq","US Equities","broker","")]});
+R({id:"16",raw:"OBSERVED",purpose:"平台内持仓",rail:"platform",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"平台点差",latency:"平台内",limit:"产品清单",
+  compliance:"平台内投资账户，非银行托管表述。",
+  currencies:["USDT","EUR","USD"], version:"2026-09-03.catalog",
+  hops:[N("stable-mix","USDT / EUR / USD","chain",""),N("neverless","Neverless","fin",""),N("etf","US Stocks / ETF","broker","")]});
+R({id:"17",raw:"OBSERVED",purpose:"法币直入",rail:"platform",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"卡组织/钱包费未拆分",latency:"即时到平台",limit:"卡与地区",
+  compliance:"支付网络规则。",
+  currencies:["USD","EUR"], version:"2026-09-03.catalog",
+  hops:[N("applepay","Apple Pay","pay","USD / EUR"),N("neverless","Neverless","fin","")]});
+R({id:"18",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"Wise/Kraken 入金费",latency:"银行轨道",limit:"个人账户认证",
+  compliance:"持牌交易所法币通道。",
+  currencies:["EUR","USD"], version:"2026-09-03.catalog",
+  hops:[N("wise","Wise","fin",""),N("kraken","Kraken","ex","个人账户")]});
+R({id:"19",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"出金费",latency:"银行轨道",limit:"个人账户认证",
+  compliance:"持牌交易所法币通道。",
+  currencies:["EUR","USD"], version:"2026-09-03.catalog",
+  hops:[N("kraken","Kraken","ex","个人账户"),N("wise","Wise","fin","")]});
+R({id:"20",raw:"OBSERVED",purpose:"回流",rail:"counterparty",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"兑换 + 支付通道费",latency:"多跳",limit:"支付应用风控",
+  compliance:"对手方/支付回流。与 ACH/SEPA 不同类，账户与商户规则变化快。",
+  currencies:["USDC","USD","CNY"], version:"2026-09-03.catalog",
+  hops:[N("usdc","USDC","chain",""),N("backpack","Backpack","ex","USD"),N("daxiang","大象银行","bank","USD"),N("wechat","WeChat Pay","pay",""),N("cn-bank","境内银行卡","bank","CNY")]});
+R({id:"21",raw:"OBSERVED",purpose:"C2C",rail:"counterparty",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"C2C 点差",latency:"对手方",limit:"广告与风控",
+  compliance:"对手方轨道。不提供操作步骤。存在冻结与纠纷风险。",
+  currencies:["USDT","CNY"], version:"2026-09-03.catalog",
+  hops:[N("c2c-ex","Binance / OKX / HTX","ex","C2C"),N("cn-bank","境内银行卡","bank","CNY")]});
+R({id:"22",raw:"OBSERVED",purpose:"汇出",rail:"platform",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"支付公司点差",latency:"未标注",limit:"收款账户资质",
+  compliance:"需自有境外账户与平台出金规则。",
+  currencies:["USDT","USD"], version:"2026-09-03.catalog",
+  hops:[N("ex-any","Exchange","ex","USDT 等"),N("biyapay","Biyapay","fin","USD"),N("own-os","自有境外账户","bank","")]});
+R({id:"23",raw:"OBSERVED",purpose:"1:1",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"接近 1:1 的宣传不构成报价",latency:"ACH 周期",limit:"Fluidkey 地区与身份",
+  compliance:"ACH 相关产品，核验官方说明。",
+  currencies:["USDC","USD"], version:"2026-09-03.catalog",
+  hops:[N("usdc","USDC","chain",""),N("fluidkey","Fluidkey","fin","ACH"),N("usd-bank","USD Bank","bank","USD")]});
+R({id:"24",raw:"OBSERVED",purpose:"1:1",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"接近 1:1 的宣传不构成报价",latency:"ACH 周期",limit:"Fluidkey 地区与身份",
+  compliance:"ACH 相关产品，核验官方说明。",
+  currencies:["USD","USDC"], version:"2026-09-03.catalog",
+  hops:[N("usd-bank","USD Bank","bank","USD"),N("fluidkey","Fluidkey","fin","ACH"),N("usdc","USDC","chain","")]});
+R({id:"25",raw:"OBSERVED",purpose:"备选入金",rail:"platform",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+  cost:"链上费",latency:"链上确认",limit:"网络与资产名单",
+  compliance:"公链入平台。",
+  currencies:["USDC"], version:"2026-09-03.catalog",
+  hops:[N("usdc","USDC","chain",""),N("avax","Avalanche C-Chain","chain",""),N("neverless","Neverless","fin","")]});
+R({id:"26",raw:"OBSERVED",purpose:"U卡/消费",rail:"platform",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"卡组织 + 平台费",latency:"消费级",limit:"商户与风控",
+  compliance:"平台预付卡。商户与发卡行随时可拒。",
+  currencies:["USDT","USD","CNY"], version:"2026-09-03.catalog",
+  hops:[N("usdt","USDT","chain",""),N("gate","Gate","ex",""),N("gate-card","Gate Card","card","USD"),N("alipay","Alipay","pay","")]});
+R({id:"27",raw:"OBSERVED",purpose:"U卡/消费",rail:"platform",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"卡组织费",latency:"消费级",limit:"商户",
+  compliance:"商户是否接受该卡以现场为准。",
+  currencies:["USD","CNY"], version:"2026-09-03.catalog",
+  hops:[N("gate-card","Gate Card","card",""),N("meituan","Meituan","pay","")]});
+R({id:"28",raw:"OBSERVED",purpose:"小额回款",rail:"counterparty",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"未报价",latency:"商户结算",limit:"明确小额",
+  compliance:"商户码回流。与银行转账不同类，不提供操作说明。",
+  currencies:["CNY"], version:"2026-09-03.catalog",
+  hops:[N("gate-card","Gate Card","card",""),N("alipay-qr","Alipay 商户码","pay","CNY 小额"),N("mch-bank","商户银行卡","bank","")]});
+R({id:"29",raw:"OBSERVED",purpose:"U卡/消费",rail:"platform",lastChecked:"2026-09-02",amount:"小额",result:"目录记为通过；作者查 BIN 显示刚果发卡",
+  cost:"兑换 + 卡费",latency:"消费级",limit:"卡组织与商户",
+  compliance:"预付卡 BIN 归属可能与预期发卡地不同。",
+  currencies:["USDT","USD"], version:"2026-09-03.catalog",
+  hops:[N("usdt","USDT","chain",""),N("bybit-spot","Bybit Spot","ex","兑 USD"),N("bybit-card","Bybit Card","card",""),N("spend","Merchant Spend","pay","")]});
+R({id:"30",raw:"OBSERVED",purpose:"Visa/订阅",rail:"platform",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"卡费",latency:"即时授权",limit:"订阅商户",
+  compliance:"商户是否接受该卡以商户为准。",
+  currencies:["USD","EUR"], version:"2026-09-03.catalog",
+  hops:[N("starryblu","Starryblu","fin",""),N("starry-visa","Starryblu Visa","card",""),N("ai-sub","ChatGPT / Claude","pay","")]});
+R({id:"31",raw:"OBSERVED",purpose:"扫码/消费",rail:"platform",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"未报价",latency:"支付级",limit:"钱包与商户风控",
+  compliance:"支付应用规则变化快。",
+  currencies:["CNY"], version:"2026-09-03.catalog",
+  hops:[N("starryblu","Starryblu","fin",""),N("wx-ali","WeChat Pay / Alipay","pay","")]});
+R({id:"32",raw:"OBSERVED",purpose:"钱包支付",rail:"platform",lastChecked:"2026-09-02",amount:"小额",result:"作者称成功绑定；与 Apple Pay 差异未测完",
+  cost:"未报价",latency:"绑定后支付级",limit:"未标注",
+  compliance:"绑定成功不等于后续支付一定通过。",
+  currencies:["EUR"], version:"2026-09-03.catalog",
+  hops:[N("tenpaygo","TenPayGo","pay",""),N("starry-wallet","Starryblu Wallet","fin","")]});
+R({id:"33",raw:"OBSERVED",purpose:"绑卡/消费",rail:"platform",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
+  cost:"卡组织费",latency:"授权级",limit:"商户",
+  compliance:"三方支付与卡组规则。",
+  currencies:["EUR","CNY"], version:"2026-09-03.catalog",
+  hops:[N("fiat24","Fiat24","fin",""),N("mc","Mastercard","card",""),N("wx-ali-ap","WeChat / Alipay / Apple Pay","pay","")]});
+R({id:"34",raw:"OBSERVED",purpose:"消费",rail:"regulated",lastChecked:"2026-09-02",amount:"小额",result:"目录记为通过",
+  cost:"银行消费无额外点差或有 ATM/外汇费",latency:"授权级",limit:"账户与商户",
+  compliance:"持牌数字银行借记消费。作者称 N26 卡 BIN 显示德国。",
+  currencies:["EUR"], version:"2026-09-03.catalog",
+  hops:[N("neverless","Neverless","fin","EUR"),N("n26","N26","bank",""),N("daily","日常消费 / AI 订阅","pay","")]});
+R({id:"35",raw:"PARTIAL",purpose:"形态",rail:"platform",lastChecked:"2026-09-03",amount:"未标注",result:"部分闭环",
+  cost:"未报价",latency:"未完测",limit:"未标注",
+  compliance:"片段，不能当作完整出金路径。",
+  currencies:["USDT"], version:"2026-09-03.catalog",
+  hops:[N("neverless","Neverless","fin",""),N("fiat24","Fiat24","fin","到账 USDT0")]});
+R({id:"36",raw:"PARTIAL",purpose:"建议链",rail:"platform",lastChecked:"2026-09-03",amount:"未标注",result:"建议形态，非完整实测闭环",
+  cost:"未报价",latency:"未完测",limit:"见 iFAST/Neverless 费用帖",
+  compliance:"建议链，不是承诺可用。",
+  currencies:["EUR"], version:"2026-09-03.catalog",
+  hops:[N("ifast","iFAST","bank",""),N("fiat24","Fiat24","fin",""),N("neverless","Neverless","fin",""),N("kraken","Kraken","ex","")]});
+R({id:"37",raw:"PENDING",purpose:"EUR IBAN",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"待闭环",
+  cost:"未知",latency:"未知",limit:"IBAN 产品是否对客开放未确认",
+  compliance:"虚线。开户排队记录见 2026-08-09。",
+  currencies:["EUR"], version:"2026-09-03.catalog",
+  hops:[N("neverless","Neverless","fin","EUR"),N("starryblu","Starryblu","fin","EUR IBAN")], dashed:true});
+R({id:"38",raw:"PENDING",purpose:"EUR IBAN",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"待闭环",
+  cost:"未知",latency:"未知",limit:"未确认",
+  compliance:"虚线。",
+  currencies:["EUR"], version:"2026-09-03.catalog",
+  hops:[N("starryblu","Starryblu","fin","EUR IBAN"),N("n26","N26","bank","")], dashed:true});
+
+const state = {status:"", type:"", rail:"", purpose:"", ccy:"", q:"", node:"", view:"list"};
+
+function parseDate(s){ const [y,m,d]=s.split("-").map(Number); return Date.UTC(y,m-1,d); }
+function effectiveStatus(r){
+  const age = (Date.now() - parseDate(r.lastChecked)) / 86400000;
+  if(r.raw!=="PENDING" && age > DATA.staleAfterDays) return "STALE";
+  return r.raw;
+}
+function hay(r){
+  return [r.id,r.purpose,r.rail,r.amount,r.result,r.compliance,...r.currencies,...r.hops.map(h=>h.name+" "+h.id+" "+(h.ccy||""))].join(" ").toLowerCase();
+}
+function filtered(){
+  return DATA.routes.filter(r=>{
+    const st = effectiveStatus(r);
+    if(state.status && st!==state.status) return false;
+    if(state.rail && r.rail!==state.rail) return false;
+    if(state.purpose && r.purpose!==state.purpose) return false;
+    if(state.ccy && !r.currencies.includes(state.ccy)) return false;
+    if(state.type && !r.hops.some(h=>h.type===state.type)) return false;
+    if(state.node && !r.hops.some(h=>h.id===state.node)) return false;
+    if(state.q && !hay(r).includes(state.q.toLowerCase())) return false;
+    return true;
+  });
+}
+function setFilter(k,v){
+  state[k] = (state[k]===v ? "" : v);
+  render();
+}
+
+function kpiCounts(list){
+  const n={OBSERVED:0,PARTIAL:0,PENDING:0,STALE:0};
+  list.forEach(r=>n[effectiveStatus(r)]++);
+  return n;
+}
+
+function renderLegend(){
+  const items = [
+    ["type","pay","支付 / 商户"],["type","card","卡 / 钱包"],["type","fin","金融服务"],
+    ["type","bank","银行"],["type","ex","交易所"],["type","chain","链 / 稳定币"],["type","broker","券商"],
+    ["sep"],
+    ["rail","regulated","监管轨道"],["rail","platform","平台内轨道"],["rail","counterparty","对手方轨道"],
+    ["sep"],
+    ["status","OBSERVED","OBSERVED"],["status","PARTIAL","PARTIAL"],["status","PENDING","PENDING"],["status","STALE","STALE"]
+  ];
+  document.getElementById("legend").innerHTML = items.map(it=>{
+    if(it[0]==="sep") return '<span class="sep"></span>';
+    const [kind,val,label]=it;
+    const active = state[kind]===val ? " active" : "";
+    const cls = kind==="status" ? (val==="OBSERVED"?"ok":val==="PARTIAL"?"frag":val==="PENDING"?"pend":"stale")
+              : kind==="rail" ? (val==="regulated"?"reg":val==="platform"?"plat":"cpty") : val;
+    return `<span class="chip${active}" data-k="${kind}" data-v="${val}"><span class="d ${cls}"></span>${label}</span>`;
+  }).join("");
+}
+
+function rowHtml(r){
+  const st = effectiveStatus(r);
+  const stCls = st==="OBSERVED"?"ok":st==="PARTIAL"?"frag":st==="PENDING"?"pend":"stale";
+  const hops = r.hops.map((h,i)=>{
+    const arr = i ? `<span class="arr${r.dashed?" dim":""}">${r.dashed?"⇢":"→"}</span>` : "";
+    return `${arr}<div class="box ${h.type}" data-node="${h.id}"><b>${h.name}</b>${h.ccy?`<i>${h.ccy}</i>`:""}</div>`;
+  }).join("");
+  return `<div class="row rail-${r.rail==="counterparty"?"cpty":r.rail==="regulated"?"reg":"plat"}">
+    <div class="row-main">
+      <span class="num">${r.id}</span>
+      <div class="st ${stCls}">${st}</div>
+      <div class="tag">${r.purpose}</div>
+      <div class="flow">${hops}</div>
+    </div>
+    <div class="meta">
+      <div>复核 <b>${r.lastChecked}</b> · ${r.amount} · ${r.result}</div>
+      <div>损耗 <b>${r.cost}</b></div>
+      <div>时延 <b>${r.latency}</b></div>
+      <div>限额 <b>${r.limit}</b></div>
+      <div>轨道 <b>${r.rail}</b> · 版本 ${r.version}</div>
+      <div>合规 <b>${r.compliance}</b></div>
+    </div>
+  </div>`;
+}
+
+function renderList(){
+  const list = filtered();
+  const groups = [
+    ["OBSERVED","ok","已观测（带日期，非永久认证）"],
+    ["PARTIAL","frag","部分闭环 / 建议链"],
+    ["PENDING","pend","待闭环"],
+    ["STALE","stale","超过窗口未复核"]
+  ];
+  let html = "";
+  groups.forEach(([st,cls,label])=>{
+    const rows = list.filter(r=>effectiveStatus(r)===st);
+    if(!rows.length) return;
+    html += `<section class="group"><div class="ghead ${cls}">${st} <small>${rows.length} ROUTES · ${label}</small></div>${rows.map(rowHtml).join("")}</section>`;
+  });
+  document.getElementById("list").innerHTML = html || '<div class="empty">无匹配链路。清除筛选后重试。</div>';
+}
+
+function renderGraph(){
+  const canvas = document.getElementById("graph");
+  const wrap = canvas.parentElement;
+  const dpr = window.devicePixelRatio||1;
+  const w = wrap.clientWidth, h = canvas.clientHeight || 520;
+  canvas.width = w*dpr; canvas.height = h*dpr; canvas.style.width=w+"px"; canvas.style.height=h+"px";
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  const list = filtered();
+  const nodes = new Map();
+  list.forEach(r=>r.hops.forEach(h=>{
+    if(!nodes.has(h.id)) nodes.set(h.id,{...h,deg:0,x:0,y:0});
+    nodes.get(h.id).deg++;
+  }));
+  const arr = Array.from(nodes.values());
+  const cx=w/2, cy=h/2, rad=Math.min(w,h)*0.36;
+  arr.forEach((n,i)=>{
+    const a = (i/Math.max(arr.length,1))*Math.PI*2 - Math.PI/2;
+    n.x = cx + Math.cos(a)*rad;
+    n.y = cy + Math.sin(a)*rad;
+  });
+  ctx.strokeStyle="#22303f"; ctx.lineWidth=1;
+  list.forEach(r=>{
+    for(let i=1;i<r.hops.length;i++){
+      const a=nodes.get(r.hops[i-1].id), b=nodes.get(r.hops[i].id);
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
     }
-    /* Clocks */
-    function pad(x){return (x<10?'0':'')+x;}
-    function tick(){
-      var now=new Date();
-      var u=now.toISOString().slice(11,19);
-      var bj=new Date(now.getTime()+8*3600*1000);
-      var b=pad(bj.getUTCHours())+':'+pad(bj.getUTCMinutes())+':'+pad(bj.getUTCSeconds());
-      document.getElementById('cUtc').textContent=u;
-      document.getElementById('cBj').textContent=b;
-    }
-    countKpi();
-    tick();
-    setInterval(tick,1000);
-  })();
+  });
+  const color={pay:"#f472b6",card:"#38bdf8",fin:"#34d399",bank:"#60a5fa",ex:"#fb923c",chain:"#a78bfa",broker:"#facc15"};
+  canvas._hit = arr;
+  arr.forEach(n=>{
+    const rr=8+Math.min(n.deg,8)*1.6;
+    ctx.beginPath(); ctx.fillStyle=color[n.type]||"#94a3b8";
+    ctx.arc(n.x,n.y,rr,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#dbe4ee"; ctx.font="11px ui-monospace,monospace"; ctx.textAlign="center";
+    ctx.fillText(n.name, n.x, n.y+rr+12);
+  });
+}
+
+function renderKpis(){
+  const all = DATA.routes.map(r=>({s:effectiveStatus(r)}));
+  const vis = filtered();
+  const n = kpiCounts(DATA.routes);
+  document.getElementById("kTotal").textContent = vis.length;
+  document.getElementById("kOk").textContent = n.OBSERVED;
+  document.getElementById("kFrag").textContent = n.PARTIAL;
+  document.getElementById("kPend").textContent = n.PENDING;
+  document.getElementById("kStale").textContent = n.STALE;
+  document.querySelectorAll(".kpi").forEach(el=>{
+    el.classList.toggle("active", el.dataset.status===state.status && state.status!=="" ? true : (el.dataset.status==="" && state.status==="" && el.classList.contains("total") ? false : el.dataset.status===state.status));
+  });
+}
+
+function fillSelects(){
+  const p = [...new Set(DATA.routes.map(r=>r.purpose))].sort();
+  const c = [...new Set(DATA.routes.flatMap(r=>r.currencies))].sort();
+  const ps = document.getElementById("purpose");
+  const cs = document.getElementById("ccy");
+  p.forEach(x=>{ const o=document.createElement("option"); o.value=x; o.textContent=x; ps.appendChild(o); });
+  c.forEach(x=>{ const o=document.createElement("option"); o.value=x; o.textContent=x; cs.appendChild(o); });
+}
+
+function render(){
+  document.getElementById("asOfTop").textContent = DATA.dataAsOf;
+  document.getElementById("asOfFoot").textContent = DATA.dataAsOf + " · APP " + DATA.version;
+  document.getElementById("staleDays").textContent = DATA.staleAfterDays;
+  renderLegend();
+  renderKpis();
+  const graphOn = state.view==="graph";
+  document.getElementById("graphWrap").hidden = !graphOn;
+  document.getElementById("list").hidden = graphOn;
+  document.getElementById("btnList").classList.toggle("active", !graphOn);
+  document.getElementById("btnGraph").classList.toggle("active", graphOn);
+  if(graphOn) renderGraph(); else renderList();
+}
+
+document.getElementById("legend").addEventListener("click", e=>{
+  const chip = e.target.closest(".chip"); if(!chip) return;
+  setFilter(chip.dataset.k, chip.dataset.v);
+});
+document.querySelector(".kpis").addEventListener("click", e=>{
+  const kpi = e.target.closest(".kpi"); if(!kpi) return;
+  state.status = kpi.dataset.status || "";
+  render();
+});
+document.getElementById("list").addEventListener("click", e=>{
+  const box = e.target.closest(".box"); if(!box) return;
+  state.node = state.node===box.dataset.node ? "" : box.dataset.node;
+  render();
+});
+document.getElementById("q").addEventListener("input", e=>{ state.q=e.target.value; render(); });
+document.getElementById("purpose").addEventListener("change", e=>{ state.purpose=e.target.value; render(); });
+document.getElementById("ccy").addEventListener("change", e=>{ state.ccy=e.target.value; render(); });
+document.getElementById("rail").addEventListener("change", e=>{ state.rail=e.target.value; render(); });
+document.getElementById("btnList").onclick=()=>{ state.view="list"; render(); };
+document.getElementById("btnGraph").onclick=()=>{ state.view="graph"; render(); };
+document.getElementById("btnReset").onclick=()=>{
+  state.status=state.type=state.rail=state.purpose=state.ccy=state.q=state.node="";
+  document.getElementById("q").value="";
+  document.getElementById("purpose").value="";
+  document.getElementById("ccy").value="";
+  document.getElementById("rail").value="";
+  render();
+};
+document.getElementById("graph").addEventListener("click", e=>{
+  const rect = e.target.getBoundingClientRect();
+  const x=e.clientX-rect.left, y=e.clientY-rect.top;
+  const hit=(e.target._hit||[]).find(n=>Math.hypot(n.x-x,n.y-y)<16);
+  if(hit){ state.node = state.node===hit.id?"":hit.id; render(); }
+});
+
+function pad(x){return (x<10?"0":"")+x;}
+function tick(){
+  const now=new Date();
+  document.getElementById("cUtc").textContent=now.toISOString().slice(11,19);
+  const bj=new Date(now.getTime()+8*3600*1000);
+  document.getElementById("cBj").textContent=pad(bj.getUTCHours())+":"+pad(bj.getUTCMinutes())+":"+pad(bj.getUTCSeconds());
+  document.getElementById("liveLamp").classList.add("on");
+  document.getElementById("liveLamp").lastChild.nodeValue=" CLOCK";
+}
+fillSelects();
+render();
+tick();
+setInterval(tick,1000);
+window.addEventListener("resize", ()=>{ if(state.view==="graph") renderGraph(); });
 </script>
 </body>
 </html>
