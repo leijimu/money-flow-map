@@ -4,7 +4,7 @@
 
 **Xizhizhu · Money Flow Map**
 
-Open-source map of global money-in / money-out lanes and financial infrastructure.
+Open-source map of observed money-in / money-out lanes and financial infrastructure.
 
 ---
 
@@ -12,45 +12,79 @@ Open-source map of global money-in / money-out lanes and financial infrastructur
 
 **https://leijimu.github.io/money-flow-map/money-flow-map.html**
 
-GitHub Pages 直接渲染，浏览器打开即用，无需下载。每次推送后约 1~2 分钟自动更新。
+GitHub Pages 直接渲染。浏览器打开即可，无需构建、无需后端。推送后约 1–2 分钟更新。
+
+本地预览：用浏览器打开仓库根目录的 `money-flow-map.html`。
 
 ---
 
-## 出入金链路图（源稿 · 一条一行）
+## 当前版本 · V0.7
 
-**[money-flow-map.html](money-flow-map.html)** — 出入金链路数据稿，一链路一行，**Bloomberg 终端风**。共 **38 条链路 / 112 个节点**，按验证状态分节、行首带连续编号：
+主文件 [`money-flow-map.html`](money-flow-map.html) 为单页终端风观测稿。数据写在页面内的 `DATA.routes`，清单与网络图共用同一份数据。
 
-| 节 | 条数 | 含义 |
-|---|---|---|
-| VERIFIED | 34 | 已闭环（01–34） |
-| PARTIAL | 2 | 部分闭环 / 片段（35–36） |
-| PENDING | 2 | 待闭环（37–38） |
-| NOT TESTED | 0 | 未实测（当前无） |
+收录 **38 条链路**。节点覆盖支付、卡与钱包、金融服务、银行、交易所、公链 / 稳定币、券商。
 
-节点类型涵盖支付、卡产品、金融机构、银行、交易所、公链、经纪商等。
+### 状态（带时效，不是永久认证）
 
-> 使用方式：浏览器直接打开文件即可（纯静态单文件，无需联网）。
+| 状态 | 含义 |
+|---|---|
+| OBSERVED | 目录中记为曾闭环，并带复核日期 |
+| PARTIAL | 部分闭环或建议链，不能当作完整路径 |
+| PENDING | 待闭环（图中为虚线） |
+| STALE | 超过 60 天未复核，由页面自动降级 |
+
+顶部时钟只表示本机时间在走，不表示链路仍然有效。有效性以页面标注的 **DATA AS OF** 与每条「复核」日期为准。
+
+### 轨道分组
+
+行首色条区分三类轨道，避免把不同可靠性画成同一档：
+
+| 轨道 | 含义 |
+|---|---|
+| 监管轨道 | 银行转账、SEPA、ACH、FPS、券商入金等 |
+| 平台内轨道 | 平台账户、预付卡消费、链上入平台等 |
+| 对手方轨道 | C2C、商户码回流等依赖对手或商户的路径 |
+
+### 页面能力
+
+- 清单：一条一行，可展开损耗、时延、限额、合规四字段（观测区间，非报价）
+- 网络图：按当前筛选结果画节点与边，点击节点反筛
+- 筛选：关键词、用途、币种、轨道、状态；图例与顶部数字可点
+- 节点主名统一为英文（如 Binance、Charles Schwab、Alipay、WeChat Pay）
+
+### 使用方式
+
+1. 打开 HTML。
+2. 用搜索框或下拉框缩小范围；点击节点胶囊只看经过该节点的链路。
+3. 需要总览时切换到「网络图」。
+4. 「清除筛选」恢复全量。
+
+本页是结构目录，不是操作步骤。
 
 ---
 
-## 历史版本
+## 仓库文件
 
-- **V0.3 · Bloomberg 终端风泳道图**：深色终端视觉、分组菜单筛选、LIVE 灯与双时钟，112 节点 / 38 链路。保存在 git 历史（commit `ce627ee`），可用 `git checkout ce627ee -- money-flow-map.html` 取回
-- **V0.2 · 64 节点交互式总图**：资金网络全景图
+| 路径 | 说明 |
+|---|---|
+| `money-flow-map.html` | 当前主页面（V0.7） |
+| `data/nodes.md` | 早期节点词典（V0.2，16 类） |
+| `data/relations.md` | 早期关系词典（V0.2） |
 
-## 数据
-
-- [`data/nodes.md`](data/nodes.md) — 节点词典（16 类 / 64 个实体）
-- [`data/relations.md`](data/relations.md) — 关系词典（8 类资金关系）
-
-## 版本
-
-- V0.6 — 去掉 A–D 渠道分组，改为按状态分节（VERIFIED / PARTIAL / PENDING / NOT TESTED），行首加阿拉伯数字编号 01–38
-- V0.4 — 出入金链路源稿 · Bloomberg 终端皮肤（深色、顶栏时钟 / LIVE / KPI 实时统计）
-- V0.3.1 — 主文件为出入金链路源稿（一条一行版）
-- V0.3 — 出入金链路泳道图（Bloomberg 终端风）
-- V0.2 — 64 节点交互式总图
+历史泳道图仍可从 git 取出：`git checkout ce627ee -- money-flow-map.html`
 
 ---
 
-*本仓库仅作链路梳理与信息整理，不构成任何操作或投资建议。*
+## 版本简史
+
+- **V0.7** — 观测状态取代 VERIFIED；轨道三分；清单 + 网络图；可筛选；损耗 / 时延 / 限额 / 合规字段；时钟与数据截止日期分离
+- **V0.6** — 按 VERIFIED / PARTIAL / PENDING / NOT TESTED 分节，编号 01–38
+- **V0.4** — 终端皮肤：深色、时钟、KPI
+- **V0.3 / V0.3.1** — 一条一行源稿与泳道图
+- **V0.2** — 64 节点交互总图
+
+---
+
+## 边界
+
+本仓库只作链路梳理与信息整理，不构成操作、投资、跨境或税务建议。通道、限额与风控会变化，使用前以各平台当前页面和适用法律为准。对手方轨道与银行轨道不可同等看待。
