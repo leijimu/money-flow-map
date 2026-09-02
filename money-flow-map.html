@@ -1,245 +1,389 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>喜蜘蛛 · 全球资金网络总图</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 100%; height: 100%; overflow: hidden; background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-  #chart { width: 100vw; height: 100vh; }
-  .info {
-    position: fixed; top: 12px; left: 12px; z-index: 10;
-    background: rgba(255,255,255,0.94); padding: 12px 16px; border-radius: 10px;
-    font-size: 12px; color: #333; box-shadow: 0 2px 12px rgba(0,0,0,0.12);
-    max-width: 300px; line-height: 1.6;
-  }
-  .info h1 { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: #1a1b1c; }
-  .info .sub { color: #6b7280; font-size: 11px; }
-  .info .tip { margin-top: 6px; color: #9ca3af; font-size: 11px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>出入金实测链路泳道图</title>
+  <style>
+    :root { --ink:#142033; --muted:#5b6778; --line:#d7dee7; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Source Han Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+      background: #eef2f6;
+      color: var(--ink);
+    }
+    header, footer { max-width: 1280px; margin: 0 auto; padding: 24px 20px 8px; }
+    h1 { font-size: 22px; margin: 0 0 8px; }
+    h2 { font-size: 16px; margin: 28px 0 10px; }
+    .sub { color: var(--muted); font-size: 13px; line-height: 1.7; max-width: 920px; }
+    .legend { display:flex; flex-wrap:wrap; gap:10px 18px; margin:14px 0 6px; font-size:12px; color:var(--muted); }
+    .chip { display:inline-flex; align-items:center; gap:6px; }
+    .d { width:12px; height:12px; border-radius:3px; border:1px solid #94a3b8; }
+    .wrap { max-width:1280px; margin:0 auto; padding:0 16px 12px; overflow-x:auto; }
+    .panel {
+      background:#fff; border:1px solid #e2e8f0; border-radius:12px;
+      margin:0 0 18px; min-width:1100px;
+    }
+    .ptitle {
+      padding:12px 16px; border-bottom:1px solid #e8edf2;
+      font-size:14px; font-weight:700; display:flex; justify-content:space-between; align-items:center;
+    }
+    .ptitle small { font-weight:500; color:var(--muted); }
+    table.lane { width:100%; border-collapse:collapse; }
+    table.lane th {
+      width:108px; text-align:left; padding:10px 12px; font-size:12px;
+      font-weight:700; color:#334155; border-bottom:1px solid #edf1f5; vertical-align:middle;
+    }
+    table.lane td {
+      padding:10px 12px; border-bottom:1px solid #edf1f5; vertical-align:middle;
+    }
+    table.lane tr:last-child th, table.lane tr:last-child td { border-bottom:0; }
+    .row { display:flex; align-items:center; gap:8px; flex-wrap:nowrap; min-height:46px; }
+    .box {
+      flex: 0 0 auto;
+      min-width: 92px;
+      max-width: 150px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border:1px solid;
+      font-size:12px;
+      line-height:1.35;
+      text-align:center;
+    }
+    .box b { display:block; font-weight:700; }
+    .box i { display:block; font-style:normal; font-size:10px; opacity:.8; }
+    .pay { background:#fce7f3; border-color:#db2777; color:#9d174d; }
+    .card { background:#e0f2fe; border-color:#0284c7; color:#075985; }
+    .fin { background:#dcfce7; border-color:#16a34a; color:#166534; }
+    .bank { background:#dbeafe; border-color:#2563eb; color:#1e3a8a; }
+    .ex { background:#ffedd5; border-color:#ea580c; color:#9a3412; }
+    .chain { background:#ede9fe; border-color:#7c3aed; color:#5b21b6; }
+    .broker { background:#fef9c3; border-color:#ca8a04; color:#854d0e; }
+    .arr { color:#0f172a; font-size:16px; font-weight:700; flex:0 0 auto; }
+    .arr.dash { color:#64748b; }
+    .note { font-size:11px; color:#64748b; margin-left:4px; white-space:nowrap; }
+    .bg-pay { background:#fdf2f8; }
+    .bg-card { background:#f0f9ff; }
+    .bg-fin { background:#f0fdf4; }
+    .bg-bank { background:#eff6ff; }
+    .bg-ex { background:#fff7ed; }
+    .bg-chain { background:#f5f3ff; }
+    .bg-broker { background:#fefce8; }
+    footer { padding-bottom:40px; font-size:12px; color:var(--muted); line-height:1.75; }
+    table.list { width:100%; border-collapse:collapse; background:#fff; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden; font-size:12.5px; }
+    table.list th, table.list td { padding:8px 10px; border-bottom:1px solid #edf1f5; text-align:left; vertical-align:top; }
+    table.list th { background:#f8fafc; }
+    code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:11.5px; }
+  </style>
 </head>
 <body>
-<div class="info">
-  <h1>喜蜘蛛 · 全球资金网络总图</h1>
-  <div class="sub">64 节点 · 11 类实体 · 160+ 资金关系</div>
-  <div class="tip">拖拽平移 · 滚轮缩放 · 点击节点高亮相邻链路</div>
-</div>
-<div id="chart"></div>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-<script>
-var chart = echarts.init(document.getElementById('chart'));
-var option = {
-  backgroundColor: 'transparent',
-  tooltip: {
-    trigger: 'item',
-    triggerOn: 'click',
-    renderMode: 'richText',
-    confine: true,
-    textStyle: { fontSize: 11, lineHeight: 16 },
-    padding: [8, 10]
-  },
-  legend: {
-    top: 12,
-    right: 16,
-    type: 'scroll',
-    orient: 'vertical',
-    itemWidth: 12,
-    itemHeight: 8,
-    textStyle: { color: '#6B7280', fontSize: 11 }
-  },
-  series: [{
-    type: 'graph',
-    layout: 'force',
-    top: 20,
-    left: 20,
-    right: 160,
-    bottom: 20,
-    roam: true,
-    draggable: true,
-    force: {
-      repulsion: 380,
-      edgeLength: [60, 160],
-      gravity: 0.04,
-      layoutAnimation: false
-    },
-    categories: [
-      { name: '法币', itemStyle: { color: '#5B8FF9' } },
-      { name: '银行', itemStyle: { color: '#5AD8A6' } },
-      { name: '金融服务', itemStyle: { color: '#6DC8EC' } },
-      { name: '支付', itemStyle: { color: '#F6BD16' } },
-      { name: '交易所', itemStyle: { color: '#9270CA' } },
-      { name: '稳定币', itemStyle: { color: '#FF9D4D' } },
-      { name: '加密资产', itemStyle: { color: '#E8684A' } },
-      { name: '公链', itemStyle: { color: '#A0A7E6' } },
-      { name: '钱包', itemStyle: { color: '#C0A6E6' } },
-      { name: '卡', itemStyle: { color: '#D48265' } },
-      { name: '商户', itemStyle: { color: '#8A8A8A' } }
-    ],
-    data: [
-      { id: 'CNY', name: 'CNY 人民币', category: 0, symbolSize: 28 },
-      { id: 'HKD', name: 'HKD 港币', category: 0, symbolSize: 28 },
-      { id: 'USD', name: 'USD 美元', category: 0, symbolSize: 30 },
-      { id: 'EUR', name: 'EUR 欧元', category: 0, symbolSize: 28 },
-      { id: 'GBP', name: 'GBP 英镑', category: 0, symbolSize: 24 },
-      { id: 'SGD', name: 'SGD 新加坡元', category: 0, symbolSize: 24 },
-      { id: 'JPY', name: 'JPY 日元', category: 0, symbolSize: 24 },
-      { id: 'CMB', name: '招商银行', category: 1, symbolSize: 20 },
-      { id: 'BOC_CN', name: '中国银行', category: 1, symbolSize: 20 },
-      { id: 'ICBC', name: '工商银行', category: 1, symbolSize: 20 },
-      { id: 'CCB', name: '建设银行', category: 1, symbolSize: 20 },
-      { id: 'ABC', name: '农业银行', category: 1, symbolSize: 20 },
-      { id: 'HSBC_HK', name: '汇丰香港', category: 1, symbolSize: 20 },
-      { id: 'BOCHK', name: '中银香港', category: 1, symbolSize: 22 },
-      { id: 'HANGSENG', name: '恒生银行', category: 1, symbolSize: 20 },
-      { id: 'SCB_HK', name: '渣打香港', category: 1, symbolSize: 20 },
-      { id: 'BOC_MO', name: '中银澳门', category: 1, symbolSize: 18 },
-      { id: 'BCM', name: '澳门商业银行', category: 1, symbolSize: 18 },
-      { id: 'JPMORGAN', name: 'JPMorgan', category: 1, symbolSize: 22 },
-      { id: 'BOFA', name: 'Bank of America', category: 1, symbolSize: 20 },
-      { id: 'CITI', name: 'Citibank', category: 1, symbolSize: 20 },
-      { id: 'WELLS_FARGO', name: 'Wells Fargo', category: 1, symbolSize: 20 },
-      { id: 'DEUTSCHE_BANK', name: 'Deutsche Bank', category: 1, symbolSize: 20 },
-      { id: 'BNP_PARIBAS', name: 'BNP Paribas', category: 1, symbolSize: 20 },
-      { id: 'UBS', name: 'UBS', category: 1, symbolSize: 20 },
-      { id: 'DBS', name: 'DBS Bank', category: 1, symbolSize: 20 },
-      { id: 'OCBC', name: 'OCBC Bank', category: 1, symbolSize: 20 },
-      { id: 'UOB', name: 'UOB', category: 1, symbolSize: 20 },
-      { id: 'WISE', name: 'Wise', category: 2, symbolSize: 20 },
-      { id: 'N26', name: 'N26', category: 2, symbolSize: 18 },
-      { id: 'IFAST', name: 'iFAST', category: 2, symbolSize: 18 },
-      { id: 'WECHAT', name: '微信支付', category: 3, symbolSize: 20 },
-      { id: 'ALIPAY', name: '支付宝', category: 3, symbolSize: 20 },
-      { id: 'APPLEPAY', name: 'Apple Pay', category: 3, symbolSize: 18 },
-      { id: 'COINBASE', name: 'Coinbase', category: 4, symbolSize: 24 },
-      { id: 'KRAKEN', name: 'Kraken', category: 4, symbolSize: 22 },
-      { id: 'BITGET', name: 'Bitget', category: 4, symbolSize: 20 },
-      { id: 'BINANCE', name: 'Binance', category: 4, symbolSize: 22 },
-      { id: 'OKX', name: 'OKX', category: 4, symbolSize: 20 },
-      { id: 'USDT', name: 'USDT', category: 5, symbolSize: 24 },
-      { id: 'USDC', name: 'USDC', category: 5, symbolSize: 24 },
-      { id: 'EURC', name: 'EURC', category: 5, symbolSize: 18 },
-      { id: 'DAI', name: 'DAI', category: 5, symbolSize: 18 },
-      { id: 'BTC', name: 'BTC', category: 6, symbolSize: 24 },
-      { id: 'ETH', name: 'ETH', category: 6, symbolSize: 24 },
-      { id: 'SOL', name: 'SOL', category: 6, symbolSize: 20 },
-      { id: 'XRP', name: 'XRP', category: 6, symbolSize: 20 },
-      { id: 'ETHEREUM', name: 'Ethereum', category: 7, symbolSize: 24 },
-      { id: 'TRON', name: 'Tron', category: 7, symbolSize: 20 },
-      { id: 'SOLANA', name: 'Solana', category: 7, symbolSize: 20 },
-      { id: 'BASE', name: 'Base', category: 7, symbolSize: 18 },
-      { id: 'ARBITRUM', name: 'Arbitrum', category: 7, symbolSize: 18 },
-      { id: 'OPTIMISM', name: 'Optimism', category: 7, symbolSize: 18 },
-      { id: 'AVALANCHE', name: 'Avalanche', category: 7, symbolSize: 18 },
-      { id: 'SELF_CUSTODY', name: '自托管钱包', category: 8, symbolSize: 18 },
-      { id: 'CUSTODIAL', name: '托管钱包', category: 8, symbolSize: 18 },
-      { id: 'EXCHANGE_WALLET', name: '交易所钱包', category: 8, symbolSize: 18 },
-      { id: 'METAMASK', name: 'MetaMask', category: 8, symbolSize: 18 },
-      { id: 'TRUST_WALLET', name: 'Trust Wallet', category: 8, symbolSize: 18 },
-      { id: 'LEDGER', name: 'Ledger', category: 8, symbolSize: 18 },
-      { id: 'UCARD', name: 'U卡', category: 9, symbolSize: 20 },
-      { id: 'VISA', name: 'Visa', category: 9, symbolSize: 22 },
-      { id: 'MASTERCARD', name: 'Mastercard', category: 9, symbolSize: 22 },
-      { id: 'MERCHANT', name: '全球商户', category: 10, symbolSize: 30 }
-    ],
-    links: [
-      { source: 'CMB', target: 'CNY' }, { source: 'BOC_CN', target: 'CNY' },
-      { source: 'ICBC', target: 'CNY' }, { source: 'CCB', target: 'CNY' },
-      { source: 'ABC', target: 'CNY' },
-      { source: 'HSBC_HK', target: 'HKD' }, { source: 'BOCHK', target: 'HKD' },
-      { source: 'HANGSENG', target: 'HKD' }, { source: 'SCB_HK', target: 'HKD' },
-      { source: 'HSBC_HK', target: 'USD' }, { source: 'BOCHK', target: 'USD' },
-      { source: 'HANGSENG', target: 'USD' }, { source: 'SCB_HK', target: 'USD' },
-      { source: 'BOC_MO', target: 'HKD' }, { source: 'BCM', target: 'HKD' },
-      { source: 'JPMORGAN', target: 'USD' }, { source: 'BOFA', target: 'USD' },
-      { source: 'CITI', target: 'USD' }, { source: 'WELLS_FARGO', target: 'USD' },
-      { source: 'DEUTSCHE_BANK', target: 'EUR' }, { source: 'BNP_PARIBAS', target: 'EUR' },
-      { source: 'UBS', target: 'EUR' },
-      { source: 'DBS', target: 'SGD' }, { source: 'OCBC', target: 'SGD' },
-      { source: 'UOB', target: 'SGD' },
-      { source: 'DBS', target: 'USD' }, { source: 'OCBC', target: 'USD' },
-      { source: 'UOB', target: 'USD' },
-      { source: 'CNY', target: 'HKD' }, { source: 'HKD', target: 'CNY' },
-      { source: 'CNY', target: 'USD' }, { source: 'USD', target: 'CNY' },
-      { source: 'CNY', target: 'EUR' }, { source: 'EUR', target: 'CNY' },
-      { source: 'HKD', target: 'USD' }, { source: 'USD', target: 'HKD' },
-      { source: 'HKD', target: 'EUR' }, { source: 'EUR', target: 'HKD' },
-      { source: 'USD', target: 'EUR' }, { source: 'EUR', target: 'USD' },
-      { source: 'CMB', target: 'BOCHK' }, { source: 'BOC_CN', target: 'BOCHK' },
-      { source: 'ICBC', target: 'BOCHK' }, { source: 'CCB', target: 'BOCHK' },
-      { source: 'ABC', target: 'BOCHK' },
-      { source: 'CMB', target: 'BOC_MO' }, { source: 'BOC_CN', target: 'BOC_MO' },
-      { source: 'ICBC', target: 'BOC_MO' }, { source: 'CCB', target: 'BOC_MO' },
-      { source: 'ABC', target: 'BOC_MO' },
-      { source: 'HSBC_HK', target: 'JPMORGAN' }, { source: 'BOCHK', target: 'JPMORGAN' },
-      { source: 'HANGSENG', target: 'JPMORGAN' }, { source: 'SCB_HK', target: 'JPMORGAN' },
-      { source: 'HSBC_HK', target: 'DEUTSCHE_BANK' }, { source: 'BOCHK', target: 'DEUTSCHE_BANK' },
-      { source: 'HANGSENG', target: 'DEUTSCHE_BANK' }, { source: 'SCB_HK', target: 'DEUTSCHE_BANK' },
-      { source: 'HSBC_HK', target: 'DBS' }, { source: 'BOCHK', target: 'DBS' },
-      { source: 'HANGSENG', target: 'DBS' }, { source: 'SCB_HK', target: 'DBS' },
-      { source: 'BOC_MO', target: 'BOCHK' }, { source: 'BCM', target: 'BOCHK' },
-      { source: 'HSBC_HK', target: 'WISE' }, { source: 'BOCHK', target: 'WISE' },
-      { source: 'HANGSENG', target: 'WISE' }, { source: 'SCB_HK', target: 'WISE' },
-      { source: 'JPMORGAN', target: 'WISE' }, { source: 'BOFA', target: 'WISE' },
-      { source: 'CITI', target: 'WISE' }, { source: 'WELLS_FARGO', target: 'WISE' },
-      { source: 'DBS', target: 'WISE' }, { source: 'OCBC', target: 'WISE' },
-      { source: 'UOB', target: 'WISE' },
-      { source: 'DEUTSCHE_BANK', target: 'N26' }, { source: 'BNP_PARIBAS', target: 'N26' },
-      { source: 'UBS', target: 'N26' },
-      { source: 'DBS', target: 'IFAST' }, { source: 'OCBC', target: 'IFAST' },
-      { source: 'UOB', target: 'IFAST' },
-      { source: 'CMB', target: 'WECHAT' }, { source: 'BOC_CN', target: 'WECHAT' },
-      { source: 'ICBC', target: 'WECHAT' }, { source: 'CCB', target: 'WECHAT' },
-      { source: 'ABC', target: 'WECHAT' },
-      { source: 'CMB', target: 'ALIPAY' }, { source: 'BOC_CN', target: 'ALIPAY' },
-      { source: 'ICBC', target: 'ALIPAY' }, { source: 'CCB', target: 'ALIPAY' },
-      { source: 'ABC', target: 'ALIPAY' },
-      { source: 'USD', target: 'COINBASE' }, { source: 'USD', target: 'KRAKEN' },
-      { source: 'USD', target: 'BITGET' }, { source: 'EUR', target: 'COINBASE' },
-      { source: 'EUR', target: 'KRAKEN' }, { source: 'HKD', target: 'COINBASE' },
-      { source: 'HKD', target: 'KRAKEN' },
-      { source: 'COINBASE', target: 'USDC' }, { source: 'COINBASE', target: 'BTC' },
-      { source: 'COINBASE', target: 'ETH' }, { source: 'KRAKEN', target: 'USDC' },
-      { source: 'KRAKEN', target: 'BTC' }, { source: 'KRAKEN', target: 'ETH' },
-      { source: 'USDC', target: 'ETHEREUM' }, { source: 'USDC', target: 'SOLANA' },
-      { source: 'USDC', target: 'BASE' }, { source: 'USDC', target: 'ARBITRUM' },
-      { source: 'USDC', target: 'OPTIMISM' }, { source: 'USDC', target: 'AVALANCHE' },
-      { source: 'USDT', target: 'ETHEREUM' }, { source: 'USDT', target: 'TRON' },
-      { source: 'ETHEREUM', target: 'COINBASE' }, { source: 'ETHEREUM', target: 'KRAKEN' },
-      { source: 'USDC', target: 'SELF_CUSTODY' }, { source: 'USDC', target: 'CUSTODIAL' },
-      { source: 'USDC', target: 'EXCHANGE_WALLET' }, { source: 'USDC', target: 'METAMASK' },
-      { source: 'USDC', target: 'TRUST_WALLET' }, { source: 'USDC', target: 'LEDGER' },
-      { source: 'USDT', target: 'SELF_CUSTODY' }, { source: 'USDT', target: 'CUSTODIAL' },
-      { source: 'USDT', target: 'EXCHANGE_WALLET' }, { source: 'USDT', target: 'METAMASK' },
-      { source: 'USDT', target: 'TRUST_WALLET' }, { source: 'USDT', target: 'LEDGER' },
-      { source: 'BTC', target: 'SELF_CUSTODY' }, { source: 'BTC', target: 'CUSTODIAL' },
-      { source: 'BTC', target: 'EXCHANGE_WALLET' }, { source: 'BTC', target: 'METAMASK' },
-      { source: 'BTC', target: 'TRUST_WALLET' }, { source: 'BTC', target: 'LEDGER' },
-      { source: 'ETH', target: 'SELF_CUSTODY' }, { source: 'ETH', target: 'CUSTODIAL' },
-      { source: 'ETH', target: 'EXCHANGE_WALLET' }, { source: 'ETH', target: 'METAMASK' },
-      { source: 'ETH', target: 'TRUST_WALLET' }, { source: 'ETH', target: 'LEDGER' },
-      { source: 'SELF_CUSTODY', target: 'ETHEREUM' }, { source: 'CUSTODIAL', target: 'ETHEREUM' },
-      { source: 'EXCHANGE_WALLET', target: 'ETHEREUM' }, { source: 'METAMASK', target: 'ETHEREUM' },
-      { source: 'TRUST_WALLET', target: 'ETHEREUM' }, { source: 'LEDGER', target: 'ETHEREUM' },
-      { source: 'ETHEREUM', target: 'SELF_CUSTODY' }, { source: 'ETHEREUM', target: 'CUSTODIAL' },
-      { source: 'ETHEREUM', target: 'EXCHANGE_WALLET' }, { source: 'ETHEREUM', target: 'METAMASK' },
-      { source: 'ETHEREUM', target: 'TRUST_WALLET' }, { source: 'ETHEREUM', target: 'LEDGER' },
-      { source: 'USDT', target: 'UCARD' }, { source: 'USDC', target: 'UCARD' },
-      { source: 'UCARD', target: 'VISA' }, { source: 'UCARD', target: 'MASTERCARD' },
-      { source: 'VISA', target: 'APPLEPAY' }, { source: 'MASTERCARD', target: 'APPLEPAY' },
-      { source: 'WECHAT', target: 'MERCHANT' }, { source: 'ALIPAY', target: 'MERCHANT' },
-      { source: 'VISA', target: 'MERCHANT' }, { source: 'MASTERCARD', target: 'MERCHANT' },
-      { source: 'APPLEPAY', target: 'MERCHANT' }
-    ],
-    label: { show: true, fontSize: 10, color: '#333' },
-    lineStyle: { color: 'source', width: 1, curveness: 0.05, opacity: 0.4 },
-    edgeSymbol: ['none', 'arrow'],
-    edgeSymbolSize: [0, 5],
-    emphasis: { focus: 'adjacency', lineStyle: { width: 2.5, opacity: 1 } }
-  }]
-};
-chart.setOption(option);
-window.addEventListener('resize', function() { chart.resize(); });
-</script>
+  <header>
+    <h1>出入金实测链路泳道图</h1>
+    <p class="sub">按节点类型分泳道，按资金方向从左至右排列。仅收录 X 公开帖文中出现过的跳转。实心箭头为用户写明已到账；灰色虚箭头为待闭环或仅片段证实。不构成操作或投资建议。</p>
+    <div class="legend">
+      <span class="chip"><span class="d pay"></span>支付 / 商户</span>
+      <span class="chip"><span class="d card"></span>卡 / 钱包</span>
+      <span class="chip"><span class="d fin"></span>金融服务平台</span>
+      <span class="chip"><span class="d bank"></span>银行</span>
+      <span class="chip"><span class="d ex"></span>交易所</span>
+      <span class="chip"><span class="d chain"></span>区块链 / 稳定币</span>
+      <span class="chip"><span class="d broker"></span>券商 / 持仓</span>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="ptitle">A. 入金到券商 <small>目标：IBKR / 嘉信 / 平台内美股</small></div>
+      <table class="lane">
+        <tr class="bg-pay">
+          <th>支付 / 商户</th>
+          <td>
+            <div class="row">
+              <div class="box pay"><b>支付宝</b><i>CNY</i></div>
+              <span class="arr">→</span>
+              <span class="note">C2C 买入</span>
+              <span class="arr">→</span>
+              <div class="box pay"><b>港卡 FPS</b><i>HKD</i></div>
+              <span class="arr">→</span>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-ex">
+          <th>交易所</th>
+          <td>
+            <div class="row">
+              <div class="box ex"><b>OKX / 币安</b><i>USDT · USDC</i></div>
+              <span class="arr">→</span>
+              <div class="box ex"><b>BIT</b><i>USDT/USDC 直入</i></div>
+              <span class="arr">→</span>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-chain">
+          <th>链 / 稳定币</th>
+          <td>
+            <div class="row">
+              <div class="box chain"><b>Arbitrum One</b><i>USDT / USDC</i></div>
+              <span class="arr">→</span>
+              <div class="box chain"><b>Avalanche</b><i>USDC 备选</i></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-card">
+          <th>卡 / 钱包</th>
+          <td>
+            <div class="row">
+              <div class="box card"><b>SafePal</b><i>接 Fiat24</i></div>
+              <span class="arr">→</span>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-fin">
+          <th>金融服务</th>
+          <td>
+            <div class="row">
+              <div class="box fin"><b>Neverless</b><i>换 EUR</i></div>
+              <span class="arr">→</span>
+              <div class="box fin"><b>Fiat24</b><i>EUR</i></div>
+              <span class="arr">→</span>
+              <div class="box fin"><b>Wise</b><i>USD / EUR / HKD</i></div>
+              <span class="arr">→</span>
+              <div class="box fin"><b>Starryblu</b><i>同名转账</i></div>
+              <span class="arr">→</span>
+              <div class="box fin"><b>Fluidkey</b><i>USDC⇄USD 1:1</i></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-bank">
+          <th>银行</th>
+          <td>
+            <div class="row">
+              <div class="box bank"><b>N26</b><i>EUR SEPA</i></div>
+              <span class="arr">→</span>
+              <div class="box bank"><b>iFAST</b><i>中转</i></div>
+              <span class="arr">→</span>
+              <div class="box bank"><b>港卡</b><i>FPS</i></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-broker">
+          <th>券商 / 持仓</th>
+          <td>
+            <div class="row">
+              <div class="box broker"><b>IBKR</b></div>
+              <span class="arr">→</span>
+              <div class="box broker"><b>嘉信理财</b><i>Wise ACH</i></div>
+              <span class="arr">→</span>
+              <div class="box broker"><b>Neverless 美股</b></div>
+              <span class="arr">→</span>
+              <div class="box broker"><b>BIT 美股正股</b></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div style="padding:10px 16px 14px;font-size:12px;color:#475569;line-height:1.7;">
+        已到账主链：<code>支付宝 → OKX C2C → Arb(USDT) → Neverless → N26/Wise/iFAST → IBKR或嘉信</code>；
+        <code>港卡 → FPS → Wise(USD) → IBKR</code>；
+        <code>C2C(USDC) → SafePal → Fiat24(EUR) → N26 → IBKR</code>；
+        <code>Starryblu → IBKR</code>；
+        <code>Wise(USD Checking) → ACH → 嘉信</code>；
+        <code>USDT/USDC → BIT → 美股正股</code>。
+        灰色待闭环：<code>Neverless ↔ Starryblu（EUR IBAN）</code>。
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ptitle">B. 稳定币出金到银行 / 支付 <small>目标：EUR、USD、HKD、CNY</small></div>
+      <table class="lane">
+        <tr class="bg-ex">
+          <th>交易所</th>
+          <td>
+            <div class="row">
+              <div class="box ex"><b>币安</b><i>USDT / USDC</i></div>
+              <span class="arr">→</span>
+              <div class="box ex"><b>OKX</b><i>提 Arb</i></div>
+              <span class="arr">→</span>
+              <div class="box ex"><b>Kraken</b><i>法币互转</i></div>
+              <span class="arr">→</span>
+              <div class="box ex"><b>Backpack</b><i>USDC→USD</i></div>
+              <span class="arr">→</span>
+              <div class="box ex"><b>C2C 大所</b><i>直出 CNY</i></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-chain">
+          <th>链 / 稳定币</th>
+          <td>
+            <div class="row">
+              <div class="box chain"><b>Arbitrum One</b><i>USDT 入 Neverless</i></div>
+              <span class="arr">→</span>
+              <div class="box chain"><b>USDT0</b><i>Neverless→Fiat24 片段</i></div>
+              <span class="arr dash">⇢</span>
+              <div class="box chain"><b>OP / Mantle</b><i>交易所网络列表</i></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-fin">
+          <th>金融服务</th>
+          <td>
+            <div class="row">
+              <div class="box fin"><b>Neverless</b><i>卖出换 EUR</i></div>
+              <span class="arr">→</span>
+              <div class="box fin"><b>Wise</b></div>
+              <span class="arr">→</span>
+              <div class="box fin"><b>Fiat24</b></div>
+              <span class="arr">→</span>
+              <div class="box fin"><b>Biyapay</b><i>兑 USD 再汇出</i></div>
+              <span class="arr">→</span>
+              <div class="box fin"><b>Fluidkey</b><i>ACH 1:1</i></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-bank">
+          <th>银行</th>
+          <td>
+            <div class="row">
+              <div class="box bank"><b>N26</b><i>秒到、宜小额</i></div>
+              <span class="arr">→</span>
+              <div class="box bank"><b>iFAST</b><i>大额或需材料</i></div>
+              <span class="arr">→</span>
+              <div class="box bank"><b>大象银行</b><i>USD</i></div>
+              <span class="arr">→</span>
+              <div class="box bank"><b>港卡</b></div>
+              <span class="arr">→</span>
+              <div class="box bank"><b>境内银行卡</b><i>CNY</i></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-pay">
+          <th>支付 / 商户</th>
+          <td>
+            <div class="row">
+              <div class="box pay"><b>微信</b><i>大象银行转出</i></div>
+              <span class="arr">→</span>
+              <div class="box pay"><b>支付宝</b><i>C2C 对侧</i></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div style="padding:10px 16px 14px;font-size:12px;color:#475569;line-height:1.7;">
+        已到账主链：<code>币安(USDT) → Neverless(EUR) → iFAST → Wise</code>；
+        <code>Neverless(EUR) → N26</code>；
+        <code>Wise ⇄ Kraken</code>；
+        <code>USDC → Backpack(USD) → 大象银行 → 微信 → 境内卡</code>；
+        <code>交易所 C2C → 境内银行卡</code>。
+        片段：<code>Neverless → Fiat24(USDT0)</code>。未形成完整实测：<code>Neverless → Arb(USDT0) → Bybit</code>。
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ptitle">C. 卡产品与商户落地 <small>目标：订阅、扫码、小额回 CNY</small></div>
+      <table class="lane">
+        <tr class="bg-ex">
+          <th>交易所</th>
+          <td>
+            <div class="row">
+              <div class="box ex"><b>Gate</b><i>USDT 充卡</i></div>
+              <span class="arr">→</span>
+              <div class="box ex"><b>Bybit</b><i>USDT 先兑 USD</i></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-fin">
+          <th>金融服务</th>
+          <td>
+            <div class="row">
+              <div class="box fin"><b>Starryblu</b></div>
+              <span class="arr">→</span>
+              <div class="box fin"><b>Fiat24</b></div>
+              <span class="arr">→</span>
+              <div class="box fin"><b>Neverless</b><i>出金到 N26 再消费</i></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-card">
+          <th>卡 / 钱包</th>
+          <td>
+            <div class="row">
+              <div class="box card"><b>Gate U卡</b><i>Visa</i></div>
+              <span class="arr">→</span>
+              <div class="box card"><b>Bybit U卡</b></div>
+              <span class="arr">→</span>
+              <div class="box card"><b>Starryblu Visa</b></div>
+              <span class="arr">→</span>
+              <div class="box card"><b>Fiat24 Mastercard</b></div>
+              <span class="arr">→</span>
+              <div class="box card"><b>N26 卡</b></div>
+              <span class="arr">→</span>
+              <div class="box card"><b>Biyapay U卡</b></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-pay">
+          <th>支付 / 商户</th>
+          <td>
+            <div class="row">
+              <div class="box pay"><b>支付宝</b><i>绑卡 / 商户码</i></div>
+              <span class="arr">→</span>
+              <div class="box pay"><b>微信</b><i>含香港微信</i></div>
+              <span class="arr">→</span>
+              <div class="box pay"><b>美团</b></div>
+              <span class="arr">→</span>
+              <div class="box pay"><b>Apple Pay</b></div>
+              <span class="arr">→</span>
+              <div class="box pay"><b>TenPayGo</b></div>
+              <span class="arr">→</span>
+              <div class="box pay"><b>ChatGPT / Claude</b></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-bank">
+          <th>银行</th>
+          <td>
+            <div class="row">
+              <div class="box bank"><b>商户银行卡</b><i>小额扫码回款</i></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div style="padding:10px 16px 14px;font-size:12px;color:#475569;line-height:1.7;">
+        已到账主链：<code>USDT → Gate U卡 → 支付宝 / 美团 / 商户码</code>；
+        <code>USDT → Bybit现货(USD) → Bybit U卡</code>；
+        <code>Starryblu Visa → SaaS</code>；
+        <code>Starryblu / Fiat24 卡 → 微信支付宝</code>；
+        <code>TenPayGo → Starryblu 钱包</code>；
+        <code>Neverless(EUR) → N26 → 日常消费与订阅</code>。
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <h2>完整箭头式对照</h2>
+    <table class="list">
+      <thead><tr><th style="width:88px">状态</th><th>链路</th></tr></thead>
+      <tbody>
+        <tr><td>已到账</td><td><code>支付宝(CNY) → OKX C2C → OKX(USDT) → Arbitrum One(USDT) → Neverless → N26(EUR)</code></td></tr>
+        <tr><td>已到账</td><td><code>Neverless(EUR) → Wise / Fiat24 / iFAST / IBKR / 嘉信理财</code></td></tr>
+        <tr><td>已到账</td><td><code>币安(USDT/USDC) → Neverless(EUR) → iFAST → Wise</code></td></tr>
+        <tr><td>已到账</td><td><code>C2C(USDC) → SafePal → Fiat24(EUR) → N26(EUR) → IBKR</code></td></tr>
+        <tr><td>已到账</td><td><code>港卡(HKD) → FPS → Wise(USD) → IBKR</code></td></tr>
+        <tr><td>已到账</td><td><code>Wise(USD Checking) → ACH → 嘉信理财</code></td></tr>
+        <tr><td>已到账</td><td><code>Wise ⇄ Kraken</code></td></tr>
+        <tr><td>已到账</td><td><code>Starryblu → IBKR</code></td></tr>
+        <tr><td>已到账</td><td><code>USDT → Gate → Gate U卡 → 支付宝 / 美团 / 商户码(CNY)</code></td></tr>
+        <tr><td>已到账</td><td><code>USDT → Bybit现货(USD) → Bybit U卡 → 消费</code></td></tr>
+        <tr><td>已到账</td><td><code>USDC → Backpack(USD) → 大象银行 → 微信 → 境内银行卡(CNY)</code></td></tr>
+        <tr><td>已到账</td><td><code>USDT/USDC → BIT → 美股正股</code></td></tr>
+        <tr><td>已到账</td><td><code>Apple Pay(USD/EUR) → Neverless</code></td></tr>
+        <tr><td>片段</td><td><code>Neverless → Fiat24(USDT0)</code></td></tr>
+        <tr><td>待闭环</td><td><code>Neverless ↔ Starryblu(EUR IBAN)</code></td></tr>
+        <tr><td>未完整实测</td><td><code>Neverless → Arbitrum One(USDT0) → Bybit</code></td></tr>
+        <tr><td>未完整实测</td><td><code>N26(EUR) → Neverless → Arbitrum One(USDT0) → ether.fi → OP Mainnet → Bybit</code></td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:16px">整理日期：2026-09-03。通道、网络与风控会变动，使用前以各平台当前页面为准。</p>
+  </footer>
 </body>
 </html>
