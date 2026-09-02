@@ -1,203 +1,271 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>出入金链路 · 一条一行</title>
-  <style>
-    :root { --ink:#142033; --muted:#5c6b7a; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "Source Han Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
-      background: #eef2f6;
-      color: var(--ink);
-    }
-    header, footer { max-width: 1280px; margin: 0 auto; padding: 24px 20px 8px; }
-    h1 { font-size: 22px; margin: 0 0 8px; }
-    .sub { color: var(--muted); font-size: 13px; line-height: 1.7; max-width: 920px; }
-    .legend { display:flex; flex-wrap:wrap; gap:8px 16px; margin:14px 0 4px; font-size:12px; color:var(--muted); }
-    .chip { display:inline-flex; align-items:center; gap:6px; }
-    .d { width:12px; height:12px; border-radius:3px; border:1px solid #94a3b8; }
-    .wrap { max-width:1280px; margin:0 auto; padding:8px 16px 24px; }
-    .group {
-      background:#fff; border:1px solid #e2e8f0; border-radius:12px; margin:0 0 16px; overflow:hidden;
-    }
-    .ghead {
-      padding:11px 16px; border-bottom:1px solid #edf1f5; font-size:14px; font-weight:700;
-      display:flex; justify-content:space-between; align-items:center; background:#f8fafc;
-    }
-    .ghead small { font-weight:500; color:var(--muted); }
-    .row {
-      display:grid;
-      grid-template-columns: 92px 78px 1fr;
-      gap:8px;
-      padding:10px 14px;
-      border-bottom:1px solid #f1f5f9;
-      align-items:center;
-    }
-    .row:last-child { border-bottom:0; }
-    .st {
-      font-size:11px; font-weight:700; text-align:center;
-      padding:4px 0; border-radius:999px;
-    }
-    .ok { background:#dcfce7; color:#166534; }
-    .frag { background:#ffedd5; color:#9a3412; }
-    .pend { background:#e0e7ff; color:#3730a3; }
-    .no { background:#f1f5f9; color:#64748b; }
-    .tag { font-size:11px; color:#64748b; }
-    .flow { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-    .box {
-      padding:6px 9px; border-radius:8px; border:1px solid; font-size:12px; line-height:1.3; text-align:center;
-    }
-    .box b { display:block; font-weight:700; }
-    .box i { display:block; font-style:normal; font-size:10px; opacity:.82; }
-    .pay { background:#fce7f3; border-color:#db2777; color:#9d174d; }
-    .card { background:#e0f2fe; border-color:#0284c7; color:#075985; }
-    .fin { background:#dcfce7; border-color:#16a34a; color:#166534; }
-    .bank { background:#dbeafe; border-color:#2563eb; color:#1e3a8a; }
-    .ex { background:#ffedd5; border-color:#ea580c; color:#9a3412; }
-    .chain { background:#ede9fe; border-color:#7c3aed; color:#5b21b6; }
-    .broker { background:#fef9c3; border-color:#ca8a04; color:#854d0e; }
-    .arr { color:#0f172a; font-weight:700; font-size:15px; }
-    .arr.dim { color:#94a3b8; }
-    footer { padding-bottom:40px; font-size:12px; color:var(--muted); line-height:1.75; }
-    @media (max-width: 720px) {
-      .row { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>出入金链路 · BBG 终端风</title>
+<style>
+  :root{
+    --bg:#04060a; --panel:#0a1018; --panel2:#0d1520; --line:#1b2735; --line2:#22303f;
+    --tx:#dbe4ee; --dim:#7f8ea3; --dim2:#55657a;
+    --amber:#ffb020; --amber2:#ff9f1a; --blue:#4da3ff; --cyan:#2dd4bf;
+    --ok:#22c55e; --frag:#ffb020; --pend:#ef4444; --no:#64748b;
+    --pay:#f472b6; --card:#38bdf8; --fin:#34d399; --bank:#60a5fa;
+    --ex:#fb923c; --chain:#a78bfa; --broker:#facc15;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--tx);
+    font-family:"SF Mono","Cascadia Mono","Roboto Mono",ui-monospace,Menlo,Consolas,"Courier New",monospace;
+    font-size:13px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:10px 16px; background:#05080d; border-bottom:1px solid var(--line);
+  }
+  .logo{color:var(--amber); font-weight:700; letter-spacing:.5px; white-space:nowrap}
+  .logo b{color:var(--tx); font-weight:400}
+  .ttl{font-size:14px; font-weight:700; letter-spacing:.3px}
+  .ttl small{color:var(--dim); font-weight:400; margin-left:8px; font-size:11px}
+  .sp{flex:1}
+  .live{display:inline-flex; align-items:center; gap:6px; color:var(--ok); font-weight:700; font-size:11px}
+  .live i{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;
+    box-shadow:0 0 8px var(--ok); animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .clk{font-size:11px;color:var(--dim);text-align:right;line-height:1.4;white-space:nowrap}
+  .clk b{color:var(--tx);font-weight:600}
+  /* ---------- kpi strip ---------- */
+  .kpis{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--line);background:var(--panel)}
+  .kpi{flex:1;min-width:120px;padding:8px 16px;border-right:1px solid var(--line)}
+  .kpi:last-child{border-right:0}
+  .kpi small{display:block;color:var(--dim);font-size:10px;letter-spacing:.8px;text-transform:uppercase}
+  .kpi b{font-size:20px;font-weight:700;line-height:1.2}
+  .kpi.ok b{color:var(--ok)} .kpi.frag b{color:var(--frag)}
+  .kpi.pend b{color:var(--pend)} .kpi.no b{color:var(--no)}
+  .kpi.total b{color:var(--tx)}
+  /* ---------- sub + legend ---------- */
+  .subwrap{padding:14px 16px 4px;max-width:1600px;margin:0 auto}
+  .sub{color:var(--dim);font-size:12px;line-height:1.8}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:10px 0 2px;font-size:11px;color:var(--dim)}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-family:inherit}
+  .chip b{color:var(--tx);font-weight:600}
+  .d{width:9px;height:9px;border-radius:2px;display:inline-block}
+  .d.pay{background:var(--pay)} .d.card{background:var(--card)} .d.fin{background:var(--fin)}
+  .d.bank{background:var(--bank)} .d.ex{background:var(--ex)} .d.chain{background:var(--chain)}
+  .d.broker{background:var(--broker)}
+  .d.ok{background:var(--ok)} .d.frag{background:var(--frag)}
+  .d.pend{background:var(--pend)} .d.no{background:var(--no)}
+  .legend .sep{border-left:1px solid var(--line2);margin:0 2px}
+  /* ---------- groups ---------- */
+  .wrap{max-width:1600px;margin:0 auto;padding:12px 16px 20px}
+  .group{background:var(--panel);border:1px solid var(--line);margin:0 0 14px;border-radius:4px;overflow:hidden}
+  .ghead{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:9px 14px;background:var(--panel2);border-bottom:1px solid var(--line);
+    font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--amber2);
+  }
+  .ghead small{font-weight:400;color:var(--dim);font-size:10px;letter-spacing:0}
+  .row{
+    display:grid;grid-template-columns:96px 84px 1fr;gap:10px;
+    padding:8px 12px;border-bottom:1px solid var(--line);align-items:center;
+  }
+  .row:nth-child(even){background:#09101a}
+  .row:last-child{border-bottom:0}
+  .st{
+    font-size:10px;font-weight:700;text-align:center;letter-spacing:.5px;
+    padding:3px 0;border-radius:2px;border:1px solid;white-space:nowrap;
+  }
+  .st.ok{color:var(--ok);border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.08)}
+  .st.frag{color:var(--frag);border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.08)}
+  .st.pend{color:var(--pend);border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.08)}
+  .st.no{color:var(--no);border-color:rgba(100,116,139,.4);background:rgba(100,116,139,.07)}
+  .tag{font-size:10px;color:var(--dim2);letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
+  .box{
+    padding:4px 8px;border-radius:3px;border:1px solid;font-size:12px;line-height:1.35;text-align:center;
+    background:#05080d;white-space:nowrap;
+  }
+  .box b{display:block;font-weight:700}
+  .box i{display:block;font-style:normal;font-size:10px;opacity:.75;color:var(--dim)}
+  .box.pay{border-color:var(--pay);color:#fbcfe8}
+  .box.card{border-color:var(--card);color:#bae6fd}
+  .box.fin{border-color:var(--fin);color:#a7f3d0}
+  .box.bank{border-color:var(--bank);color:#bfdbfe}
+  .box.ex{border-color:var(--ex);color:#fed7aa}
+  .box.chain{border-color:var(--chain);color:#ddd6fe}
+  .box.broker{border-color:var(--broker);color:#fef9c3}
+  .arr{color:var(--dim);font-weight:700;font-size:14px}
+  .arr.dim{color:#33435a;font-weight:400}
+  footer{
+    max-width:1600px;margin:0 auto;padding:2px 16px 32px;
+    font-size:11px;color:var(--dim2);line-height:1.8;
+  }
+  footer .k{color:var(--dim)}
+  /* ---------- mobile ---------- */
+  @media (max-width:760px){
+    body{font-size:12px}
+    .row{grid-template-columns:1fr;gap:6px;padding:8px 10px}
+    .st{width:auto;text-align:center}
+    .tag{padding-left:2px}
+    .kpi b{font-size:17px}
+    .topbar{gap:8px}
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>出入金链路泳道图</h1>
-    <p class="sub">一条链路占一行，严格按 A → B → C 排列。颜色表示节点类型，左侧为核验状态。仅收录公开帖文中出现过的跳转，不构成操作或投资建议。</p>
+  <div class="topbar">
+    <span class="logo">BBG&nbsp;MF&nbsp;<b>&lt;GO&gt;</b></span>
+    <span class="ttl">出入金链路 · 一条一行<small>DEPOSIT / WITHDRAW / CARD ROUTES</small></span>
+    <span class="sp"></span>
+    <span class="live"><i></i>LIVE</span>
+    <span class="clk">UTC&nbsp;<b id="cUtc">--:--:--</b><br/>北京&nbsp;<b id="cBj">--:--:--</b></span>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi total"><small>TOTAL ROUTES</small><b id="kTotal">38</b></div>
+    <div class="kpi ok"><small>VERIFIED</small><b id="kOk">0</b></div>
+    <div class="kpi frag"><small>PARTIAL</small><b id="kFrag">0</b></div>
+    <div class="kpi pend"><small>PENDING</small><b id="kPend">0</b></div>
+    <div class="kpi no"><small>NOT TESTED</small><b id="kNo">0</b></div>
+  </div>
+
+  <div class="subwrap">
+    <p class="sub">一条链路占一行，严格按 A → B → C 排列。实线箭头 = 可实测闭环；虚线 ⇢ = 片段 / 待闭环。仅收录公开帖文中出现过的跳转，不构成操作或投资建议。</p>
     <div class="legend">
-      <span class="chip"><span class="d pay"></span>支付 / 商户</span>
-      <span class="chip"><span class="d card"></span>卡 / 钱包</span>
-      <span class="chip"><span class="d fin"></span>金融服务</span>
-      <span class="chip"><span class="d bank"></span>银行</span>
-      <span class="chip"><span class="d ex"></span>交易所</span>
-      <span class="chip"><span class="d chain"></span>链 / 稳定币</span>
-      <span class="chip"><span class="d broker"></span>券商</span>
+      <span class="chip"><span class="d pay"></span><b>支付 / 商户</b></span>
+      <span class="chip"><span class="d card"></span><b>卡 / 钱包</b></span>
+      <span class="chip"><span class="d fin"></span><b>金融服务</b></span>
+      <span class="chip"><span class="d bank"></span><b>银行</b></span>
+      <span class="chip"><span class="d ex"></span><b>交易所</b></span>
+      <span class="chip"><span class="d chain"></span><b>链 / 稳定币</b></span>
+      <span class="chip"><span class="d broker"></span><b>券商</b></span>
+      <span class="sep"></span>
+      <span class="chip"><span class="d ok"></span>VERIFIED</span>
+      <span class="chip"><span class="d frag"></span>PARTIAL</span>
+      <span class="chip"><span class="d pend"></span>PENDING</span>
+      <span class="chip"><span class="d no"></span>NOT TESTED</span>
     </div>
-  </header>
+  </div>
 
   <div class="wrap">
     <section class="group">
-      <div class="ghead">入金到券商 <small>一条一行</small></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">OKX入所</div><div class="flow">
+      <div class="ghead">A · 入金到券商 <small>15 ROUTES · ONE ROW ONE LANE</small></div>
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">OKX入所</div><div class="flow">
         <div class="box pay"><b>支付宝</b><i>CNY</i></div><span class="arr">→</span>
         <div class="box ex"><b>OKX C2C</b><i>买 USDT</i></div><span class="arr">→</span>
         <div class="box ex"><b>OKX</b><i>USDT</i></div><span class="arr">→</span>
         <div class="box chain"><b>Arbitrum One</b><i>USDT</i></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">换EUR</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box bank"><b>N26</b><i>EUR · SEPA</i></div><span class="arr">→</span>
         <div class="box broker"><b>IBKR</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">换EUR</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box fin"><b>Wise</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">换EUR</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box fin"><b>Fiat24</b><i>EUR</i></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">中转</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">中转</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box bank"><b>iFAST</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">直达券商</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">直达券商</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box broker"><b>IBKR</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">直达券商</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">直达券商</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box broker"><b>嘉信理财</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">组合链</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">组合链</div><div class="flow">
         <div class="box ex"><b>币安</b><i>USDT / USDC</i></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box bank"><b>iFAST</b></div><span class="arr">→</span>
         <div class="box fin"><b>Wise</b><i>EUR / HKD</i></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">钱包中转</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">钱包中转</div><div class="flow">
         <div class="box pay"><b>C2C</b><i>USDC</i></div><span class="arr">→</span>
         <div class="box card"><b>SafePal</b></div><span class="arr">→</span>
         <div class="box fin"><b>Fiat24</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box bank"><b>N26</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box broker"><b>IBKR</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">港卡</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">港卡</div><div class="flow">
         <div class="box bank"><b>港卡</b><i>HKD</i></div><span class="arr">→</span>
         <div class="box pay"><b>FPS</b></div><span class="arr">→</span>
         <div class="box fin"><b>Wise</b><i>USD</i></div><span class="arr">→</span>
         <div class="box broker"><b>IBKR</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">ACH</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">ACH</div><div class="flow">
         <div class="box fin"><b>Wise</b><i>USD Checking</i></div><span class="arr">→</span>
         <div class="box bank"><b>ACH</b></div><span class="arr">→</span>
         <div class="box broker"><b>嘉信理财</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">新加坡户</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">新加坡户</div><div class="flow">
         <div class="box fin"><b>Starryblu</b><i>同名账户</i></div><span class="arr">→</span>
         <div class="box broker"><b>IBKR</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">稳定币直买</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">稳定币直买</div><div class="flow">
         <div class="box chain"><b>USDT / USDC</b></div><span class="arr">→</span>
         <div class="box ex"><b>BIT</b></div><span class="arr">→</span>
         <div class="box broker"><b>美股正股</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">平台内持仓</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">平台内持仓</div><div class="flow">
         <div class="box chain"><b>USDT / EUR / USD</b></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
         <div class="box broker"><b>美股 / ETF</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">法币直入</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">法币直入</div><div class="flow">
         <div class="box pay"><b>Apple Pay</b><i>USD / EUR</i></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div>
       </div></div>
     </section>
 
     <section class="group">
-      <div class="ghead">稳定币出金 / 互转 <small>一条一行</small></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">互转</div><div class="flow">
+      <div class="ghead">B · 稳定币出金 / 互转 <small>8 ROUTES · ONE ROW ONE LANE</small></div>
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">互转</div><div class="flow">
         <div class="box fin"><b>Wise</b></div><span class="arr">→</span>
         <div class="box ex"><b>Kraken</b><i>个人账户</i></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">互转</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">互转</div><div class="flow">
         <div class="box ex"><b>Kraken</b><i>个人账户</i></div><span class="arr">→</span>
         <div class="box fin"><b>Wise</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">回流</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">回流</div><div class="flow">
         <div class="box chain"><b>USDC</b></div><span class="arr">→</span>
         <div class="box ex"><b>Backpack</b><i>USD</i></div><span class="arr">→</span>
         <div class="box bank"><b>大象银行</b><i>USD</i></div><span class="arr">→</span>
         <div class="box pay"><b>微信</b></div><span class="arr">→</span>
         <div class="box bank"><b>境内银行卡</b><i>CNY</i></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">C2C</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">C2C</div><div class="flow">
         <div class="box ex"><b>币安 / OKX / HTX</b><i>C2C</i></div><span class="arr">→</span>
         <div class="box bank"><b>境内银行卡</b><i>CNY</i></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">汇出</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">汇出</div><div class="flow">
         <div class="box ex"><b>交易所</b><i>USDT 等</i></div><span class="arr">→</span>
         <div class="box fin"><b>Biyapay</b><i>USD</i></div><span class="arr">→</span>
         <div class="box bank"><b>自有境外账户</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">1:1</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">1:1</div><div class="flow">
         <div class="box chain"><b>USDC</b></div><span class="arr">→</span>
         <div class="box fin"><b>Fluidkey</b><i>ACH</i></div><span class="arr">→</span>
         <div class="box bank"><b>USD</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">1:1</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">1:1</div><div class="flow">
         <div class="box bank"><b>USD</b></div><span class="arr">→</span>
         <div class="box fin"><b>Fluidkey</b><i>ACH</i></div><span class="arr">→</span>
         <div class="box chain"><b>USDC</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">备选入金</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">备选入金</div><div class="flow">
         <div class="box chain"><b>USDC</b></div><span class="arr">→</span>
         <div class="box chain"><b>Avalanche C-Chain</b></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div>
@@ -205,47 +273,47 @@
     </section>
 
     <section class="group">
-      <div class="ghead">卡产品与商户 <small>一条一行</small></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">U卡</div><div class="flow">
+      <div class="ghead">C · 卡产品与商户 <small>9 ROUTES · ONE ROW ONE LANE</small></div>
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
         <div class="box chain"><b>USDT</b></div><span class="arr">→</span>
         <div class="box ex"><b>Gate</b></div><span class="arr">→</span>
         <div class="box card"><b>Gate U卡</b><i>USD</i></div><span class="arr">→</span>
         <div class="box pay"><b>支付宝</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">U卡</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
         <div class="box card"><b>Gate U卡</b></div><span class="arr">→</span>
         <div class="box pay"><b>美团</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">小额回款</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">小额回款</div><div class="flow">
         <div class="box card"><b>Gate U卡</b></div><span class="arr">→</span>
         <div class="box pay"><b>支付宝商户码</b><i>CNY 小额</i></div><span class="arr">→</span>
         <div class="box bank"><b>商户银行卡</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">U卡</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
         <div class="box chain"><b>USDT</b></div><span class="arr">→</span>
         <div class="box ex"><b>Bybit 现货</b><i>兑 USD</i></div><span class="arr">→</span>
         <div class="box card"><b>Bybit U卡</b></div><span class="arr">→</span>
         <div class="box pay"><b>消费</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">Visa</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">Visa</div><div class="flow">
         <div class="box fin"><b>Starryblu</b></div><span class="arr">→</span>
         <div class="box card"><b>Starryblu Visa</b></div><span class="arr">→</span>
         <div class="box pay"><b>ChatGPT / Claude</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">扫码</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">扫码</div><div class="flow">
         <div class="box fin"><b>Starryblu</b></div><span class="arr">→</span>
         <div class="box pay"><b>微信 / 支付宝</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">钱包支付</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">钱包支付</div><div class="flow">
         <div class="box pay"><b>TenPayGo</b></div><span class="arr">→</span>
         <div class="box fin"><b>Starryblu 钱包</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">绑卡</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">绑卡</div><div class="flow">
         <div class="box fin"><b>Fiat24</b></div><span class="arr">→</span>
         <div class="box card"><b>Mastercard</b></div><span class="arr">→</span>
         <div class="box pay"><b>微信 / 支付宝 / Apple Pay</b></div>
       </div></div>
-      <div class="row"><div class="st ok">已到账</div><div class="tag">消费</div><div class="flow">
+      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">消费</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box bank"><b>N26</b></div><span class="arr">→</span>
         <div class="box pay"><b>日常消费 / AI 订阅</b></div>
@@ -253,31 +321,31 @@
     </section>
 
     <section class="group">
-      <div class="ghead">片段 · 待闭环 · 未完整实测</div>
-      <div class="row"><div class="st frag">片段</div><div class="tag">形态</div><div class="flow">
+      <div class="ghead">D · 片段 · 待闭环 <small>6 ROUTES · DASHED = NOT CLOSED</small></div>
+      <div class="row"><div class="st frag">PARTIAL</div><div class="tag">形态</div><div class="flow">
         <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
         <div class="box fin"><b>Fiat24</b><i>到账 USDT0</i></div>
       </div></div>
-      <div class="row"><div class="st frag">片段</div><div class="tag">建议链</div><div class="flow">
+      <div class="row"><div class="st frag">PARTIAL</div><div class="tag">建议链</div><div class="flow">
         <div class="box bank"><b>iFAST</b></div><span class="arr">→</span>
         <div class="box fin"><b>Fiat24</b></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
         <div class="box ex"><b>Kraken</b></div>
       </div></div>
-      <div class="row"><div class="st pend">待闭环</div><div class="tag">EUR IBAN</div><div class="flow">
+      <div class="row"><div class="st pend">PENDING</div><div class="tag">EUR IBAN</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr dim">⇢</span>
         <div class="box fin"><b>Starryblu</b><i>EUR IBAN</i></div>
       </div></div>
-      <div class="row"><div class="st pend">待闭环</div><div class="tag">EUR IBAN</div><div class="flow">
+      <div class="row"><div class="st pend">PENDING</div><div class="tag">EUR IBAN</div><div class="flow">
         <div class="box fin"><b>Starryblu</b><i>EUR IBAN</i></div><span class="arr dim">⇢</span>
         <div class="box bank"><b>N26</b></div>
       </div></div>
-      <div class="row"><div class="st no">未完整实测</div><div class="tag">您举例</div><div class="flow">
+      <div class="row"><div class="st no">NOT TESTED</div><div class="tag">您举例</div><div class="flow">
         <div class="box fin"><b>Neverless</b></div><span class="arr dim">⇢</span>
         <div class="box chain"><b>Arbitrum One</b><i>USDT0</i></div><span class="arr dim">⇢</span>
         <div class="box ex"><b>Bybit</b></div>
       </div></div>
-      <div class="row"><div class="st no">未完整实测</div><div class="tag">您举例</div><div class="flow">
+      <div class="row"><div class="st no">NOT TESTED</div><div class="tag">您举例</div><div class="flow">
         <div class="box bank"><b>N26</b><i>EUR</i></div><span class="arr dim">⇢</span>
         <div class="box fin"><b>Neverless</b></div><span class="arr dim">⇢</span>
         <div class="box chain"><b>Arbitrum One</b><i>USDT0</i></div><span class="arr dim">⇢</span>
@@ -287,6 +355,45 @@
       </div></div>
     </section>
   </div>
-  <footer>整理日期：2026-09-03。通道、网络与风控会变动，使用前以各平台当前页面为准。</footer>
+
+  <footer>
+    <span class="k">DATA AS OF</span> 2026-09-03 · 通道、网络与风控会变动，使用前以各平台当前页面为准 · 仅整理公开信息，不构成操作或投资建议
+  </footer>
+
+<script>
+  (function(){
+    /* KPI: count statuses from the DOM itself (single source = rows) */
+    function countKpi(){
+      var rows=document.querySelectorAll('.row');
+      var n={ok:0,frag:0,pend:0,no:0};
+      rows.forEach(function(r){
+        var st=r.querySelector('.st');
+        if(!st)return;
+        if(st.classList.contains('ok'))n.ok++;
+        else if(st.classList.contains('frag'))n.frag++;
+        else if(st.classList.contains('pend'))n.pend++;
+        else if(st.classList.contains('no'))n.no++;
+      });
+      document.getElementById('kTotal').textContent=rows.length;
+      document.getElementById('kOk').textContent=n.ok;
+      document.getElementById('kFrag').textContent=n.frag;
+      document.getElementById('kPend').textContent=n.pend;
+      document.getElementById('kNo').textContent=n.no;
+    }
+    /* Clocks */
+    function pad(x){return (x<10?'0':'')+x;}
+    function tick(){
+      var now=new Date();
+      var u=now.toISOString().slice(11,19);
+      var bj=new Date(now.getTime()+8*3600*1000);
+      var b=pad(bj.getUTCHours())+':'+pad(bj.getUTCMinutes())+':'+pad(bj.getUTCSeconds());
+      document.getElementById('cUtc').textContent=u;
+      document.getElementById('cBj').textContent=b;
+    }
+    countKpi();
+    tick();
+    setInterval(tick,1000);
+  })();
+</script>
 </body>
 </html>
