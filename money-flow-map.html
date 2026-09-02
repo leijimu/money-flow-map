@@ -68,12 +68,18 @@
     font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--amber2);
   }
   .ghead small{font-weight:400;color:var(--dim);font-size:10px;letter-spacing:0}
+  .ghead.ok{color:var(--ok)} .ghead.frag{color:var(--frag)}
+  .ghead.pend{color:var(--pend)} .ghead.no{color:var(--no)}
   .row{
-    display:grid;grid-template-columns:96px 84px 1fr;gap:10px;
+    display:grid;grid-template-columns:44px 100px 84px 1fr;gap:10px;
     padding:8px 12px;border-bottom:1px solid var(--line);align-items:center;
   }
   .row:nth-child(even){background:#09101a}
   .row:last-child{border-bottom:0}
+  .num{
+    font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--dim2);
+    text-align:center;font-variant-numeric:tabular-nums;user-select:none;
+  }
   .st{
     font-size:10px;font-weight:700;text-align:center;letter-spacing:.5px;
     padding:3px 0;border-radius:2px;border:1px solid;white-space:nowrap;
@@ -107,9 +113,11 @@
   /* ---------- mobile ---------- */
   @media (max-width:760px){
     body{font-size:12px}
-    .row{grid-template-columns:1fr;gap:6px;padding:8px 10px}
-    .st{width:auto;text-align:center}
-    .tag{padding-left:2px}
+    .row{grid-template-columns:auto 1fr;gap:4px 10px;padding:8px 10px;align-items:start}
+    .num{grid-column:1;grid-row:1/4;text-align:left;padding-top:2px}
+    .st{grid-column:2;grid-row:1;width:auto}
+    .tag{grid-column:2;grid-row:2;padding-left:2px}
+    .flow{grid-column:2;grid-row:3}
     .kpi b{font-size:17px}
     .topbar{gap:8px}
   }
@@ -133,7 +141,7 @@
   </div>
 
   <div class="subwrap">
-    <p class="sub">一条链路占一行，严格按 A → B → C 排列。实线箭头 = 可实测闭环；虚线 ⇢ = 片段 / 待闭环。仅收录公开帖文中出现过的跳转，不构成操作或投资建议。</p>
+    <p class="sub">一条链路占一行，按状态分组：VERIFIED 已实测 / PARTIAL 部分闭环 / PENDING 待闭环 / NOT TESTED 未实测。行内节点按 A → B → C 顺序排列。实线箭头 = 可实测闭环；虚线 ⇢ = 片段 / 待闭环。仅收录公开帖文中出现过的跳转，不构成操作或投资建议。</p>
     <div class="legend">
       <span class="chip"><span class="d pay"></span><b>支付 / 商户</b></span>
       <span class="chip"><span class="d card"></span><b>卡 / 钱包</b></span>
@@ -152,13 +160,13 @@
 
   <div class="wrap">
     <section class="group">
-      <div class="ghead">A · 入金到券商 <small>15 ROUTES · ONE ROW ONE LANE</small></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">中转</div><div class="flow">
+      <div class="ghead ok">VERIFIED <small>34 ROUTES · ONE ROW ONE LANE</small></div>
+      <div class="row"><span class="num">01</span><div class="st ok">VERIFIED</div><div class="tag">中转</div><div class="flow">
         <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
         <div class="box chain"><b>Arbitrum One</b><i>USDT0</i></div><span class="arr">→</span>
         <div class="box ex"><b>Bybit</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">中转</div><div class="flow">
+      <div class="row"><span class="num">02</span><div class="st ok">VERIFIED</div><div class="tag">中转</div><div class="flow">
         <div class="box bank"><b>N26</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
         <div class="box chain"><b>Arbitrum One</b><i>USDT0</i></div><span class="arr">→</span>
@@ -166,167 +174,159 @@
         <div class="box chain"><b>OP Mainnet</b></div><span class="arr">→</span>
         <div class="box ex"><b>Bybit</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">OKX入所</div><div class="flow">
+      <div class="row"><span class="num">03</span><div class="st ok">VERIFIED</div><div class="tag">OKX入所</div><div class="flow">
         <div class="box pay"><b>支付宝</b><i>CNY</i></div><span class="arr">→</span>
         <div class="box ex"><b>OKX C2C</b><i>买 USDT</i></div><span class="arr">→</span>
         <div class="box ex"><b>OKX</b><i>USDT</i></div><span class="arr">→</span>
         <div class="box chain"><b>Arbitrum One</b><i>USDT</i></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
+      <div class="row"><span class="num">04</span><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box bank"><b>N26</b><i>EUR · SEPA</i></div><span class="arr">→</span>
         <div class="box broker"><b>IBKR</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
+      <div class="row"><span class="num">05</span><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box fin"><b>Wise</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
+      <div class="row"><span class="num">06</span><div class="st ok">VERIFIED</div><div class="tag">换EUR</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box fin"><b>Fiat24</b><i>EUR</i></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">中转</div><div class="flow">
+      <div class="row"><span class="num">07</span><div class="st ok">VERIFIED</div><div class="tag">中转</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box bank"><b>iFAST</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">直达券商</div><div class="flow">
+      <div class="row"><span class="num">08</span><div class="st ok">VERIFIED</div><div class="tag">直达券商</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box broker"><b>IBKR</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">直达券商</div><div class="flow">
+      <div class="row"><span class="num">09</span><div class="st ok">VERIFIED</div><div class="tag">直达券商</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box broker"><b>嘉信理财</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">组合链</div><div class="flow">
+      <div class="row"><span class="num">10</span><div class="st ok">VERIFIED</div><div class="tag">组合链</div><div class="flow">
         <div class="box ex"><b>币安</b><i>USDT / USDC</i></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box bank"><b>iFAST</b></div><span class="arr">→</span>
         <div class="box fin"><b>Wise</b><i>EUR / HKD</i></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">钱包中转</div><div class="flow">
+      <div class="row"><span class="num">11</span><div class="st ok">VERIFIED</div><div class="tag">钱包中转</div><div class="flow">
         <div class="box pay"><b>C2C</b><i>USDC</i></div><span class="arr">→</span>
         <div class="box card"><b>SafePal</b></div><span class="arr">→</span>
         <div class="box fin"><b>Fiat24</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box bank"><b>N26</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box broker"><b>IBKR</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">港卡</div><div class="flow">
+      <div class="row"><span class="num">12</span><div class="st ok">VERIFIED</div><div class="tag">港卡</div><div class="flow">
         <div class="box bank"><b>港卡</b><i>HKD</i></div><span class="arr">→</span>
         <div class="box pay"><b>FPS</b></div><span class="arr">→</span>
         <div class="box fin"><b>Wise</b><i>USD</i></div><span class="arr">→</span>
         <div class="box broker"><b>IBKR</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">ACH</div><div class="flow">
+      <div class="row"><span class="num">13</span><div class="st ok">VERIFIED</div><div class="tag">ACH</div><div class="flow">
         <div class="box fin"><b>Wise</b><i>USD Checking</i></div><span class="arr">→</span>
         <div class="box bank"><b>ACH</b></div><span class="arr">→</span>
         <div class="box broker"><b>嘉信理财</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">新加坡户</div><div class="flow">
+      <div class="row"><span class="num">14</span><div class="st ok">VERIFIED</div><div class="tag">新加坡户</div><div class="flow">
         <div class="box fin"><b>Starryblu</b><i>同名账户</i></div><span class="arr">→</span>
         <div class="box broker"><b>IBKR</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">稳定币直买</div><div class="flow">
+      <div class="row"><span class="num">15</span><div class="st ok">VERIFIED</div><div class="tag">稳定币直买</div><div class="flow">
         <div class="box chain"><b>USDT / USDC</b></div><span class="arr">→</span>
         <div class="box ex"><b>BIT</b></div><span class="arr">→</span>
         <div class="box broker"><b>美股正股</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">平台内持仓</div><div class="flow">
+      <div class="row"><span class="num">16</span><div class="st ok">VERIFIED</div><div class="tag">平台内持仓</div><div class="flow">
         <div class="box chain"><b>USDT / EUR / USD</b></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
         <div class="box broker"><b>美股 / ETF</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">法币直入</div><div class="flow">
+      <div class="row"><span class="num">17</span><div class="st ok">VERIFIED</div><div class="tag">法币直入</div><div class="flow">
         <div class="box pay"><b>Apple Pay</b><i>USD / EUR</i></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div>
       </div></div>
-    </section>
-
-    <section class="group">
-      <div class="ghead">B · 稳定币出金 / 互转 <small>8 ROUTES · ONE ROW ONE LANE</small></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">互转</div><div class="flow">
+      <div class="row"><span class="num">18</span><div class="st ok">VERIFIED</div><div class="tag">互转</div><div class="flow">
         <div class="box fin"><b>Wise</b></div><span class="arr">→</span>
         <div class="box ex"><b>Kraken</b><i>个人账户</i></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">互转</div><div class="flow">
+      <div class="row"><span class="num">19</span><div class="st ok">VERIFIED</div><div class="tag">互转</div><div class="flow">
         <div class="box ex"><b>Kraken</b><i>个人账户</i></div><span class="arr">→</span>
         <div class="box fin"><b>Wise</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">回流</div><div class="flow">
+      <div class="row"><span class="num">20</span><div class="st ok">VERIFIED</div><div class="tag">回流</div><div class="flow">
         <div class="box chain"><b>USDC</b></div><span class="arr">→</span>
         <div class="box ex"><b>Backpack</b><i>USD</i></div><span class="arr">→</span>
         <div class="box bank"><b>大象银行</b><i>USD</i></div><span class="arr">→</span>
         <div class="box pay"><b>微信</b></div><span class="arr">→</span>
         <div class="box bank"><b>境内银行卡</b><i>CNY</i></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">C2C</div><div class="flow">
+      <div class="row"><span class="num">21</span><div class="st ok">VERIFIED</div><div class="tag">C2C</div><div class="flow">
         <div class="box ex"><b>币安 / OKX / HTX</b><i>C2C</i></div><span class="arr">→</span>
         <div class="box bank"><b>境内银行卡</b><i>CNY</i></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">汇出</div><div class="flow">
+      <div class="row"><span class="num">22</span><div class="st ok">VERIFIED</div><div class="tag">汇出</div><div class="flow">
         <div class="box ex"><b>交易所</b><i>USDT 等</i></div><span class="arr">→</span>
         <div class="box fin"><b>Biyapay</b><i>USD</i></div><span class="arr">→</span>
         <div class="box bank"><b>自有境外账户</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">1:1</div><div class="flow">
+      <div class="row"><span class="num">23</span><div class="st ok">VERIFIED</div><div class="tag">1:1</div><div class="flow">
         <div class="box chain"><b>USDC</b></div><span class="arr">→</span>
         <div class="box fin"><b>Fluidkey</b><i>ACH</i></div><span class="arr">→</span>
         <div class="box bank"><b>USD</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">1:1</div><div class="flow">
+      <div class="row"><span class="num">24</span><div class="st ok">VERIFIED</div><div class="tag">1:1</div><div class="flow">
         <div class="box bank"><b>USD</b></div><span class="arr">→</span>
         <div class="box fin"><b>Fluidkey</b><i>ACH</i></div><span class="arr">→</span>
         <div class="box chain"><b>USDC</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">备选入金</div><div class="flow">
+      <div class="row"><span class="num">25</span><div class="st ok">VERIFIED</div><div class="tag">备选入金</div><div class="flow">
         <div class="box chain"><b>USDC</b></div><span class="arr">→</span>
         <div class="box chain"><b>Avalanche C-Chain</b></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div>
       </div></div>
-    </section>
-
-    <section class="group">
-      <div class="ghead">C · 卡产品与商户 <small>9 ROUTES · ONE ROW ONE LANE</small></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
+      <div class="row"><span class="num">26</span><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
         <div class="box chain"><b>USDT</b></div><span class="arr">→</span>
         <div class="box ex"><b>Gate</b></div><span class="arr">→</span>
         <div class="box card"><b>Gate U卡</b><i>USD</i></div><span class="arr">→</span>
         <div class="box pay"><b>支付宝</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
+      <div class="row"><span class="num">27</span><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
         <div class="box card"><b>Gate U卡</b></div><span class="arr">→</span>
         <div class="box pay"><b>美团</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">小额回款</div><div class="flow">
+      <div class="row"><span class="num">28</span><div class="st ok">VERIFIED</div><div class="tag">小额回款</div><div class="flow">
         <div class="box card"><b>Gate U卡</b></div><span class="arr">→</span>
         <div class="box pay"><b>支付宝商户码</b><i>CNY 小额</i></div><span class="arr">→</span>
         <div class="box bank"><b>商户银行卡</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
+      <div class="row"><span class="num">29</span><div class="st ok">VERIFIED</div><div class="tag">U卡</div><div class="flow">
         <div class="box chain"><b>USDT</b></div><span class="arr">→</span>
         <div class="box ex"><b>Bybit 现货</b><i>兑 USD</i></div><span class="arr">→</span>
         <div class="box card"><b>Bybit U卡</b></div><span class="arr">→</span>
         <div class="box pay"><b>消费</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">Visa</div><div class="flow">
+      <div class="row"><span class="num">30</span><div class="st ok">VERIFIED</div><div class="tag">Visa</div><div class="flow">
         <div class="box fin"><b>Starryblu</b></div><span class="arr">→</span>
         <div class="box card"><b>Starryblu Visa</b></div><span class="arr">→</span>
         <div class="box pay"><b>ChatGPT / Claude</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">扫码</div><div class="flow">
+      <div class="row"><span class="num">31</span><div class="st ok">VERIFIED</div><div class="tag">扫码</div><div class="flow">
         <div class="box fin"><b>Starryblu</b></div><span class="arr">→</span>
         <div class="box pay"><b>微信 / 支付宝</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">钱包支付</div><div class="flow">
+      <div class="row"><span class="num">32</span><div class="st ok">VERIFIED</div><div class="tag">钱包支付</div><div class="flow">
         <div class="box pay"><b>TenPayGo</b></div><span class="arr">→</span>
         <div class="box fin"><b>Starryblu 钱包</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">绑卡</div><div class="flow">
+      <div class="row"><span class="num">33</span><div class="st ok">VERIFIED</div><div class="tag">绑卡</div><div class="flow">
         <div class="box fin"><b>Fiat24</b></div><span class="arr">→</span>
         <div class="box card"><b>Mastercard</b></div><span class="arr">→</span>
         <div class="box pay"><b>微信 / 支付宝 / Apple Pay</b></div>
       </div></div>
-      <div class="row"><div class="st ok">VERIFIED</div><div class="tag">消费</div><div class="flow">
+      <div class="row"><span class="num">34</span><div class="st ok">VERIFIED</div><div class="tag">消费</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr">→</span>
         <div class="box bank"><b>N26</b></div><span class="arr">→</span>
         <div class="box pay"><b>日常消费 / AI 订阅</b></div>
@@ -334,22 +334,26 @@
     </section>
 
     <section class="group">
-      <div class="ghead">D · 片段 · 待闭环 <small>6 ROUTES · DASHED = NOT CLOSED</small></div>
-      <div class="row"><div class="st frag">PARTIAL</div><div class="tag">形态</div><div class="flow">
+      <div class="ghead frag">PARTIAL <small>2 ROUTES · ONE ROW ONE LANE</small></div>
+      <div class="row"><span class="num">35</span><div class="st frag">PARTIAL</div><div class="tag">形态</div><div class="flow">
         <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
         <div class="box fin"><b>Fiat24</b><i>到账 USDT0</i></div>
       </div></div>
-      <div class="row"><div class="st frag">PARTIAL</div><div class="tag">建议链</div><div class="flow">
+      <div class="row"><span class="num">36</span><div class="st frag">PARTIAL</div><div class="tag">建议链</div><div class="flow">
         <div class="box bank"><b>iFAST</b></div><span class="arr">→</span>
         <div class="box fin"><b>Fiat24</b></div><span class="arr">→</span>
         <div class="box fin"><b>Neverless</b></div><span class="arr">→</span>
         <div class="box ex"><b>Kraken</b></div>
       </div></div>
-      <div class="row"><div class="st pend">PENDING</div><div class="tag">EUR IBAN</div><div class="flow">
+    </section>
+
+    <section class="group">
+      <div class="ghead pend">PENDING <small>2 ROUTES · ONE ROW ONE LANE</small></div>
+      <div class="row"><span class="num">37</span><div class="st pend">PENDING</div><div class="tag">EUR IBAN</div><div class="flow">
         <div class="box fin"><b>Neverless</b><i>EUR</i></div><span class="arr dim">⇢</span>
         <div class="box fin"><b>Starryblu</b><i>EUR IBAN</i></div>
       </div></div>
-      <div class="row"><div class="st pend">PENDING</div><div class="tag">EUR IBAN</div><div class="flow">
+      <div class="row"><span class="num">38</span><div class="st pend">PENDING</div><div class="tag">EUR IBAN</div><div class="flow">
         <div class="box fin"><b>Starryblu</b><i>EUR IBAN</i></div><span class="arr dim">⇢</span>
         <div class="box bank"><b>N26</b></div>
       </div></div>
