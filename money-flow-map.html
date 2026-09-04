@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>出入金链路 · 观测稿 V0.7.1</title>
+<title>出入金链路 · 观测稿 V0.7.2</title>
 <style>
   :root{
     --bg:#04060a; --panel:#0a1018; --panel2:#0d1520; --line:#1b2735; --line2:#22303f;
@@ -144,7 +144,7 @@
 <body>
   <div class="topbar">
     <span class="logo">喜蜘蛛&nbsp;<b>· 出入金链路图 · Money Flow Map</b></span>
-    <span class="ttl">观测稿 V0.7.1<small>LIST + GRAPH · NOT ADVICE</small></span>
+    <span class="ttl">观测稿 V0.7.2<small>LIST + GRAPH · NOT ADVICE</small></span>
     <span class="sp"></span>
     <span class="live" id="liveLamp"><i></i>CLOCK</span>
     <span class="clk">UTC <b id="cUtc">--:--:--</b><br/>北京 <b id="cBj">--:--:--</b></span>
@@ -198,7 +198,7 @@
 <script>
 const N = (id,name,type,ccy)=>({id,name,type,ccy});
 const DATA = {
-  version: "0.7.1",
+  version: "0.7.2",
   dataAsOf: "2026-09-04",
   staleAfterDays: 60,
   routes: []
@@ -412,6 +412,16 @@ R({id:"41",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09
   compliance:"国际汇款，监管轨道。",
   currencies:["EUR"], version:"2026-09-04.catalog",
   hops:[N("starryblu","Starryblu","fin","EUR"),N("ifast","iFAST","bank","EUR")]});
+R({id:"42",raw:"OBSERVED",purpose:"U卡/消费",rail:"platform",lastChecked:"2026-09-04",amount:"未标注",result:"Bybit Card 消费支付宝，即时到账",
+  cost:"损耗约 2%",latency:"即时（消费级授权）",limit:"商户与风控",
+  compliance:"预付卡消费；商户是否接受该卡以现场为准。",
+  currencies:["USDT","USD","CNY"], version:"2026-09-04.catalog",
+  hops:[N("bybit-card","Bybit Card","card",""),N("alipay","Alipay","pay","CNY")]});
+R({id:"43",raw:"OBSERVED",purpose:"U卡/消费",rail:"platform",lastChecked:"2026-09-04",amount:"未标注",result:"Bybit Card 消费微信，即时到账",
+  cost:"损耗约 2%",latency:"即时（消费级授权）",limit:"商户与风控",
+  compliance:"预付卡消费；商户是否接受该卡以现场为准。",
+  currencies:["USDT","USD","CNY"], version:"2026-09-04.catalog",
+  hops:[N("bybit-card","Bybit Card","card",""),N("wechat","WeChat Pay","pay","")]});
 
 const state = {status:"", type:"", rail:"", purpose:"", ccy:"", q:"", node:"", view:"list"};
 
