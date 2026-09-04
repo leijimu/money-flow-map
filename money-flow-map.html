@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>出入金链路 · 观测稿 V0.7</title>
+<title>出入金链路 · 观测稿 V0.7.1</title>
 <style>
   :root{
     --bg:#04060a; --panel:#0a1018; --panel2:#0d1520; --line:#1b2735; --line2:#22303f;
@@ -144,7 +144,7 @@
 <body>
   <div class="topbar">
     <span class="logo">喜蜘蛛&nbsp;<b>· 出入金链路图 · Money Flow Map</b></span>
-    <span class="ttl">观测稿 V0.7<small>LIST + GRAPH · NOT ADVICE</small></span>
+    <span class="ttl">观测稿 V0.7.1<small>LIST + GRAPH · NOT ADVICE</small></span>
     <span class="sp"></span>
     <span class="live" id="liveLamp"><i></i>CLOCK</span>
     <span class="clk">UTC <b id="cUtc">--:--:--</b><br/>北京 <b id="cBj">--:--:--</b></span>
@@ -198,8 +198,8 @@
 <script>
 const N = (id,name,type,ccy)=>({id,name,type,ccy});
 const DATA = {
-  version: "0.7.0",
-  dataAsOf: "2026-09-03",
+  version: "0.7.1",
+  dataAsOf: "2026-09-04",
   staleAfterDays: 60,
   routes: []
 };
@@ -387,16 +387,31 @@ R({id:"36",raw:"PARTIAL",purpose:"建议链",rail:"platform",lastChecked:"2026-0
   compliance:"建议链，不是承诺可用。",
   currencies:["EUR"], version:"2026-09-03.catalog",
   hops:[N("ifast","iFAST","bank",""),N("fiat24","Fiat24","fin",""),N("neverless","Neverless","fin",""),N("kraken","Kraken","ex","")]});
-R({id:"37",raw:"PENDING",purpose:"EUR IBAN",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"待闭环",
-  cost:"未知",latency:"未知",limit:"IBAN 产品是否对客开放未确认",
-  compliance:"虚线。开户排队记录见 2026-08-09。",
-  currencies:["EUR"], version:"2026-09-03.catalog",
-  hops:[N("neverless","Neverless","fin","EUR"),N("starryblu","Starryblu","fin","EUR IBAN")], dashed:true});
-R({id:"38",raw:"PENDING",purpose:"EUR IBAN",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"待闭环",
-  cost:"未知",latency:"未知",limit:"未确认",
-  compliance:"虚线。",
-  currencies:["EUR"], version:"2026-09-03.catalog",
-  hops:[N("starryblu","Starryblu","fin","EUR IBAN"),N("n26","N26","bank","")], dashed:true});
+R({id:"37",raw:"OBSERVED",purpose:"出金",rail:"regulated",lastChecked:"2026-09-04",amount:"10 EUR",result:"个人 IBAN 出金，足额到账",
+  cost:"未注明扣费",latency:"未注明",limit:"个人 IBAN",
+  compliance:"同名 IBAN 出金，监管轨道。",
+  currencies:["EUR"], version:"2026-09-04.catalog",
+  hops:[N("neverless","Neverless","fin","EUR"),N("starryblu","Starryblu","fin","")]});
+R({id:"38",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-04",amount:"未标注",result:"同名 SEPA 互转，秒到、无损",
+  cost:"无损（未扣费）",latency:"秒到",limit:"同名账户",
+  compliance:"同名 SEPA，监管轨道。",
+  currencies:["EUR"], version:"2026-09-04.catalog",
+  hops:[N("starryblu","Starryblu","fin",""),N("n26","N26","bank","EUR · SEPA")]});
+R({id:"39",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-04",amount:"未标注",result:"同名 SEPA 互转，秒到、无损",
+  cost:"无损（未扣费）",latency:"秒到",limit:"同名账户",
+  compliance:"同名 SEPA，监管轨道。",
+  currencies:["EUR"], version:"2026-09-04.catalog",
+  hops:[N("n26","N26","bank","EUR · SEPA"),N("starryblu","Starryblu","fin","")]});
+R({id:"40",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-04",amount:"未标注",result:"同币种 EUR 国际汇款，约 1 分钟到账",
+  cost:"未注明扣费",latency:"约 1 分钟",limit:"同币种 EUR",
+  compliance:"国际汇款，监管轨道。",
+  currencies:["EUR"], version:"2026-09-04.catalog",
+  hops:[N("ifast","iFAST","bank","EUR"),N("starryblu","Starryblu","fin","EUR")]});
+R({id:"41",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-04",amount:"未标注",result:"同币种 EUR 国际汇款，约 1 分钟到账",
+  cost:"未注明扣费",latency:"约 1 分钟",limit:"同币种 EUR",
+  compliance:"国际汇款，监管轨道。",
+  currencies:["EUR"], version:"2026-09-04.catalog",
+  hops:[N("starryblu","Starryblu","fin","EUR"),N("ifast","iFAST","bank","EUR")]});
 
 const state = {status:"", type:"", rail:"", purpose:"", ccy:"", q:"", node:"", view:"list"};
 
