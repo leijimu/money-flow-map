@@ -18,11 +18,11 @@ GitHub Pages 直接渲染。浏览器打开即可，无需构建、无需后端�
 
 ---
 
-## 当前版本 · V0.7
+## 当前版本 · V0.8
 
 主文件 [`money-flow-map.html`](money-flow-map.html) 为单页终端风观测稿。数据写在页面内的 `DATA.routes`，清单与网络图共用同一份数据。
 
-收录 **38 条链路**。节点覆盖支付、卡与钱包、金融服务、银行、交易所、公链 / 稳定币、券商。
+收录 **40 条链路**（其中 2 条为拼接建议链，见下）。节点覆盖支付、卡与钱包、金融服务、银行、交易所、公链 / 稳定币、券商。
 
 ### 状态（带时效，不是永久认证）
 
@@ -67,7 +67,7 @@ GitHub Pages 直接渲染。浏览器打开即可，无需构建、无需后端�
 
 | 路径 | 说明 |
 |---|---|
-| `money-flow-map.html` | 当前主页面（V0.7） |
+| `money-flow-map.html` | 当前主页面（V0.8） |
 | `data/nodes.md` | 早期节点词典（V0.2，16 类） |
 | `data/relations.md` | 早期关系词典（V0.2） |
 
@@ -77,6 +77,7 @@ GitHub Pages 直接渲染。浏览器打开即可，无需构建、无需后端�
 
 ## 版本简史
 
+- **V0.8** — 合并同类项：4 组双向对合并为单条（Wise⇄Kraken、USDC⇄USD Bank、Starryblu⇄N26、iFAST⇄Starryblu），Bybit Card 消费支付宝 / 微信两条合并为一条；新增拼接链 44（全图最长，15 节点：USDT → Bybit → 支付宝 → OKX → Arbitrum → Neverless → Fiat24 → N26 → Starryblu → iFAST → Wise → ACH → Schwab）与 45（最长全监管链，港卡 → FPS → Wise → ACH → Schwab），拼接链一律标 PARTIAL，各段已观测、衔接未复核、全程未闭环
 - **V0.7** — 观测状态取代 VERIFIED；轨道三分；清单 + 网络图；可筛选；损耗 / 时延 / 限额 / 合规字段；时钟与数据截止日期分离
 - **V0.6** — 按 VERIFIED / PARTIAL / PENDING / NOT TESTED 分节，编号 01–38
 - **V0.4** — 终端皮肤：深色、时钟、KPI

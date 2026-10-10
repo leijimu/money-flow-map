@@ -198,7 +198,7 @@
 <script>
 const N = (id,name,type,ccy)=>({id,name,type,ccy});
 const DATA = {
-  version: "0.7.2",
+  version: "0.8.0",
   dataAsOf: "2026-09-04",
   staleAfterDays: 60,
   routes: []
@@ -292,16 +292,11 @@ R({id:"17",raw:"OBSERVED",purpose:"法币直入",rail:"platform",lastChecked:"20
   compliance:"支付网络规则。",
   currencies:["USD","EUR"], version:"2026-09-03.catalog",
   hops:[N("applepay","Apple Pay","pay","USD / EUR"),N("neverless","Neverless","fin","")]});
-R({id:"18",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+R({id:"18",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过（双向互转，原 18 / 19 合并）",
   cost:"Wise/Kraken 入金费",latency:"银行轨道",limit:"个人账户认证",
   compliance:"持牌交易所法币通道。",
   currencies:["EUR","USD"], version:"2026-09-03.catalog",
   hops:[N("wise","Wise","fin",""),N("kraken","Kraken","ex","个人账户")]});
-R({id:"19",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
-  cost:"出金费",latency:"银行轨道",limit:"个人账户认证",
-  compliance:"持牌交易所法币通道。",
-  currencies:["EUR","USD"], version:"2026-09-03.catalog",
-  hops:[N("kraken","Kraken","ex","个人账户"),N("wise","Wise","fin","")]});
 R({id:"20",raw:"OBSERVED",purpose:"回流",rail:"counterparty",lastChecked:"2026-09-03",amount:"小额",result:"目录记为通过",
   cost:"兑换 + 支付通道费",latency:"多跳",limit:"支付应用风控",
   compliance:"对手方/支付回流。与 ACH/SEPA 不同类，账户与商户规则变化快。",
@@ -317,16 +312,11 @@ R({id:"22",raw:"OBSERVED",purpose:"汇出",rail:"platform",lastChecked:"2026-09-
   compliance:"需自有境外账户与平台出金规则。",
   currencies:["USDT","USD"], version:"2026-09-03.catalog",
   hops:[N("ex-any","Exchange","ex","USDT 等"),N("biyapay","Biyapay","fin","USD"),N("own-os","自有境外账户","bank","")]});
-R({id:"23",raw:"OBSERVED",purpose:"1:1",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
+R({id:"23",raw:"OBSERVED",purpose:"1:1",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过（双向，原 23 / 24 合并）",
   cost:"接近 1:1 的宣传不构成报价",latency:"ACH 周期",limit:"Fluidkey 地区与身份",
   compliance:"ACH 相关产品，核验官方说明。",
   currencies:["USDC","USD"], version:"2026-09-03.catalog",
   hops:[N("usdc","USDC","chain",""),N("fluidkey","Fluidkey","fin","ACH"),N("usd-bank","USD Bank","bank","USD")]});
-R({id:"24",raw:"OBSERVED",purpose:"1:1",rail:"regulated",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
-  cost:"接近 1:1 的宣传不构成报价",latency:"ACH 周期",limit:"Fluidkey 地区与身份",
-  compliance:"ACH 相关产品，核验官方说明。",
-  currencies:["USD","USDC"], version:"2026-09-03.catalog",
-  hops:[N("usd-bank","USD Bank","bank","USD"),N("fluidkey","Fluidkey","fin","ACH"),N("usdc","USDC","chain","")]});
 R({id:"25",raw:"OBSERVED",purpose:"备选入金",rail:"platform",lastChecked:"2026-09-03",amount:"未标注",result:"目录记为通过",
   cost:"链上费",latency:"链上确认",limit:"网络与资产名单",
   compliance:"公链入平台。",
@@ -392,36 +382,31 @@ R({id:"37",raw:"OBSERVED",purpose:"出金",rail:"regulated",lastChecked:"2026-09
   compliance:"同名 IBAN 出金，监管轨道。",
   currencies:["EUR"], version:"2026-09-04.catalog",
   hops:[N("neverless","Neverless","fin","EUR"),N("starryblu","Starryblu","fin","")]});
-R({id:"38",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-04",amount:"未标注",result:"同名 SEPA 互转，秒到、无损",
+R({id:"38",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-04",amount:"未标注",result:"同名 SEPA 互转，秒到、无损（双向，原 38 / 39 合并）",
   cost:"无损（未扣费）",latency:"秒到",limit:"同名账户",
   compliance:"同名 SEPA，监管轨道。",
   currencies:["EUR"], version:"2026-09-04.catalog",
   hops:[N("starryblu","Starryblu","fin",""),N("n26","N26","bank","EUR · SEPA")]});
-R({id:"39",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-04",amount:"未标注",result:"同名 SEPA 互转，秒到、无损",
-  cost:"无损（未扣费）",latency:"秒到",limit:"同名账户",
-  compliance:"同名 SEPA，监管轨道。",
-  currencies:["EUR"], version:"2026-09-04.catalog",
-  hops:[N("n26","N26","bank","EUR · SEPA"),N("starryblu","Starryblu","fin","")]});
-R({id:"40",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-04",amount:"未标注",result:"同币种 EUR 国际汇款，约 1 分钟到账",
+R({id:"40",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-04",amount:"未标注",result:"同币种 EUR 国际汇款，约 1 分钟到账（双向，原 40 / 41 合并）",
   cost:"未注明扣费",latency:"约 1 分钟",limit:"同币种 EUR",
   compliance:"国际汇款，监管轨道。",
   currencies:["EUR"], version:"2026-09-04.catalog",
   hops:[N("ifast","iFAST","bank","EUR"),N("starryblu","Starryblu","fin","EUR")]});
-R({id:"41",raw:"OBSERVED",purpose:"互转",rail:"regulated",lastChecked:"2026-09-04",amount:"未标注",result:"同币种 EUR 国际汇款，约 1 分钟到账",
-  cost:"未注明扣费",latency:"约 1 分钟",limit:"同币种 EUR",
-  compliance:"国际汇款，监管轨道。",
-  currencies:["EUR"], version:"2026-09-04.catalog",
-  hops:[N("starryblu","Starryblu","fin","EUR"),N("ifast","iFAST","bank","EUR")]});
-R({id:"42",raw:"OBSERVED",purpose:"U卡/消费",rail:"platform",lastChecked:"2026-09-04",amount:"未标注",result:"Bybit Card 消费支付宝，即时到账",
+R({id:"42",raw:"OBSERVED",purpose:"U卡/消费",rail:"platform",lastChecked:"2026-09-04",amount:"未标注",result:"Bybit Card 消费支付宝 / 微信，即时到账（原 42 / 43 合并）",
   cost:"损耗约 2%",latency:"即时（消费级授权）",limit:"商户与风控",
   compliance:"预付卡消费；商户是否接受该卡以现场为准。",
   currencies:["USDT","USD","CNY"], version:"2026-09-04.catalog",
-  hops:[N("bybit-card","Bybit Card","card",""),N("alipay","Alipay","pay","CNY")]});
-R({id:"43",raw:"OBSERVED",purpose:"U卡/消费",rail:"platform",lastChecked:"2026-09-04",amount:"未标注",result:"Bybit Card 消费微信，即时到账",
-  cost:"损耗约 2%",latency:"即时（消费级授权）",limit:"商户与风控",
-  compliance:"预付卡消费；商户是否接受该卡以现场为准。",
-  currencies:["USDT","USD","CNY"], version:"2026-09-04.catalog",
-  hops:[N("bybit-card","Bybit Card","card",""),N("wechat","WeChat Pay","pay","")]});
+  hops:[N("bybit-card","Bybit Card","card",""),N("wx-ali","WeChat Pay / Alipay","pay","CNY")]});
+R({id:"44",raw:"PARTIAL",purpose:"最长链",rail:"counterparty",lastChecked:"2026-10-11",amount:"未标注",result:"拼接链：由已观测段组成（原 29 / 42 / 03 / 06 / 11 / 38 / 40 / 10 / 13），全程未实测闭环",
+  cost:"各段损耗叠加：Bybit Card 段约 2%，C2C 段以点差为主，其余多段未报价",latency:"多跳，银行段 T+1 至 T+3 为瓶颈",limit:"各段限额取最严",
+  compliance:"拼接链，不是承诺可用。全链按最弱段定级：含支付宝买 U 的对手方段（原 03），风险高于全监管轨道。各段原状态均为 OBSERVED，段与段之间的衔接未单独复核。",
+  currencies:["USDT","USD","CNY","EUR"], version:"2026-10-11.chain",
+  hops:[N("usdt","USDT","chain",""),N("bybit-spot","Bybit Spot","ex","兑 USD"),N("bybit-card","Bybit Card","card",""),N("alipay","Alipay","pay","CNY"),N("okx-c2c","OKX C2C","ex","买 USDT"),N("okx","OKX","ex","USDT"),N("arb","Arbitrum One","chain","USDT"),N("neverless","Neverless","fin",""),N("fiat24","Fiat24","fin","EUR"),N("n26","N26","bank","EUR · SEPA"),N("starryblu","Starryblu","fin",""),N("ifast","iFAST","bank",""),N("wise","Wise","fin","USD"),N("ach","ACH","bank",""),N("schwab","Charles Schwab","broker","")]});
+R({id:"45",raw:"PARTIAL",purpose:"最长监管链",rail:"regulated",lastChecked:"2026-10-11",amount:"未标注",result:"拼接链：由已观测段组成（原 12 / 13），全程未实测闭环",
+  cost:"FPS 通常低费 + ACH 通常低费；Wise 入账或有固定扣费（见 10 HKD 观测）",latency:"当日到 T+3",limit:"银行卡与 Wise 资料；同名",
+  compliance:"拼接链，不是承诺可用。全程监管轨道：香港 FPS + 持牌换汇 + ACH 入券商。两段原状态均为 OBSERVED，衔接点 Wise 未单独复核。",
+  currencies:["HKD","USD"], version:"2026-10-11.chain",
+  hops:[N("hkcard","HK Card","bank","HKD"),N("fps","FPS","pay",""),N("wise","Wise","fin","USD"),N("ach","ACH","bank",""),N("schwab","Charles Schwab","broker","")]});
 
 const state = {status:"", type:"", rail:"", purpose:"", ccy:"", q:"", node:"", view:"list"};
 
