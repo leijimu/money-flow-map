@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>出入金链路 · 观测稿 V0.8.0</title>
+<meta name="description" content="喜蜘蛛 · 全球出入金链路与资金基础设施观测图：38+ 条链路的状态、损耗、时延与轨道分类，仅作信息整理，不构成操作建议。" />
+<title>出入金链路 · 观测稿</title>
 <style>
   :root{
     --bg:#04060a; --panel:#0a1018; --panel2:#0d1520; --line:#1b2735; --line2:#22303f;
@@ -17,7 +18,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{
     background:var(--bg); color:var(--tx);
-    font-family:"SF Mono","Cascadia Mono","Roboto Mono",ui-monospace,Menlo,Consolas,"Courier New",monospace;
+    font-family:"SF Mono","Cascadia Mono","Roboto Mono",ui-monospace,Menlo,Consolas,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
     font-size:13px; line-height:1.55; -webkit-font-smoothing:antialiased;
   }
   .topbar{
@@ -143,10 +144,10 @@
 </head>
 <body>
   <div class="topbar">
-    <span class="logo">喜蜘蛛&nbsp;<b>· 出入金链路图 · Money Flow Map</b></span>
-    <span class="ttl">观测稿 V0.8.0<small>LIST + GRAPH · NOT ADVICE</small></span>
+    <span class="logo">喜蜘蛛&nbsp;<b>· 全球出入金链路图</b></span>
+    <span class="ttl">观测稿 <span id="verLabel"></span><small>清单 + 网络图 · 非操作建议</small></span>
     <span class="sp"></span>
-    <span class="live" id="liveLamp"><i></i>CLOCK</span>
+    <span class="live" id="liveLamp"><i></i>时钟</span>
     <span class="clk">UTC <b id="cUtc">--:--:--</b><br/>北京 <b id="cBj">--:--:--</b></span>
   </div>
 
@@ -158,15 +159,15 @@
   </div>
 
   <div class="kpis">
-    <div class="kpi total" data-status=""><small>VISIBLE</small><b id="kTotal">0</b></div>
-    <div class="kpi ok" data-status="OBSERVED"><small>OBSERVED</small><b id="kOk">0</b></div>
-    <div class="kpi frag" data-status="PARTIAL"><small>PARTIAL</small><b id="kFrag">0</b></div>
-    <div class="kpi pend" data-status="PENDING"><small>PENDING</small><b id="kPend">0</b></div>
-    <div class="kpi stale" data-status="STALE"><small>STALE</small><b id="kStale">0</b></div>
+    <div class="kpi total" data-status=""><small>当前显示</small><b id="kTotal">0</b></div>
+    <div class="kpi ok" data-status="OBSERVED"><small>已观测</small><b id="kOk">0</b></div>
+    <div class="kpi frag" data-status="PARTIAL"><small>部分闭环</small><b id="kFrag">0</b></div>
+    <div class="kpi pend" data-status="PENDING"><small>待闭环</small><b id="kPend">0</b></div>
+    <div class="kpi stale" data-status="STALE"><small>已过期</small><b id="kStale">0</b></div>
   </div>
 
   <div class="subwrap">
-    <p class="sub">状态为带日期的观测，不是永久认证。超过 <span id="staleDays">60</span> 天未复核自动降为 STALE。实线 = 目录中记为闭环；虚线 = 片段。点节点、图例或 KPI 可筛选。</p>
+    <p class="sub">状态为带日期的观测，不是永久认证。超过 <span id="staleDays">60</span> 天未复核自动降为「已过期」。实线 = 目录中记为闭环；虚线 = 片段。点节点、图例或 KPI 可筛选。</p>
     <div class="legend" id="legend"></div>
     <div class="filters">
       <input id="q" placeholder="搜索节点 / 用途 / 币种 / 备注" />
@@ -191,14 +192,14 @@
   </div>
 
   <footer>
-    <span class="k">DATA AS OF</span> <span id="asOfFoot">—</span>
+    <span class="k">数据截至</span> <span id="asOfFoot">—</span>
     · 仅整理公开信息，不构成操作或投资建议
     <a class="x" href="https://github.com/leijimu/money-flow-map" target="_blank" rel="noopener">GitHub 原仓库</a>
   </footer>
 <script>
 const N = (id,name,type,ccy)=>({id,name,type,ccy});
 const DATA = {
-  version: "0.8.0",
+  version: "0.9.0",
   dataAsOf: "2026-09-04",
   staleAfterDays: 60,
   routes: []
@@ -417,7 +418,7 @@ function effectiveStatus(r){
   return r.raw;
 }
 function hay(r){
-  return [r.id,r.purpose,r.rail,r.amount,r.result,r.compliance,...r.currencies,...r.hops.map(h=>h.name+" "+h.id+" "+(h.ccy||""))].join(" ").toLowerCase();
+  return [r.id,r.purpose,r.rail,r.amount,r.result,r.compliance,...r.currencies,...r.hops.map(h=>h.name+" "+nodeLabel(h)+" "+h.id+" "+(h.ccy||""))].join(" ").toLowerCase();
 }
 function filtered(){
   return DATA.routes.filter(r=>{
@@ -443,6 +444,24 @@ function kpiCounts(list){
   return n;
 }
 
+
+const ST_CN = {OBSERVED:"已观测", PARTIAL:"部分闭环", PENDING:"待闭环", STALE:"已过期"};
+const RAIL_CN = {regulated:"监管轨道", platform:"平台内轨道", counterparty:"对手方轨道"};
+const NODE_CN = {
+  "alipay":["支付宝","Alipay"], "wechat":["微信支付","WeChat Pay"],
+  "wx-ali":["微信支付 / 支付宝","WeChat Pay · Alipay"],
+  "wx-ali-ap":["微信 / 支付宝 / 苹果支付","WeChat · Alipay · Apple Pay"],
+  "applepay":["苹果支付","Apple Pay"], "alipay-qr":["支付宝商户码","Alipay QR"],
+  "schwab":["嘉信证券","Charles Schwab"], "ifast":["奕丰 iFAST","iFAST"],
+  "usdt":["泰达币","USDT"], "hkcard":["香港银行卡","HK Card"],
+  "fps":["转数快","FPS"], "mc":["万事达卡","Mastercard"],
+  "spend":["商户消费","Merchant Spend"], "ex-any":["任意交易所","Exchange"],
+  "etf":["美股 / ETF","US Stocks · ETF"], "us-eq":["美股","US Equities"],
+  "usd-bank":["美元银行账户","USD Bank"], "meituan":["美团","Meituan"],
+  "starry-wallet":["Starryblu 钱包","Starryblu Wallet"]
+};
+function nodeLabel(h){ const m = NODE_CN[h.id]; return m ? m[0] : h.name; }
+
 function renderLegend(){
   const items = [
     ["type","pay","支付 / 商户"],["type","card","卡 / 钱包"],["type","fin","金融服务"],
@@ -450,7 +469,7 @@ function renderLegend(){
     ["sep"],
     ["rail","regulated","监管轨道"],["rail","platform","平台内轨道"],["rail","counterparty","对手方轨道"],
     ["sep"],
-    ["status","OBSERVED","OBSERVED"],["status","PARTIAL","PARTIAL"],["status","PENDING","PENDING"],["status","STALE","STALE"]
+    ["status","OBSERVED","已观测"],["status","PARTIAL","部分闭环"],["status","PENDING","待闭环"],["status","STALE","已过期"]
   ];
   document.getElementById("legend").innerHTML = items.map(it=>{
     if(it[0]==="sep") return '<span class="sep"></span>';
@@ -467,12 +486,14 @@ function rowHtml(r){
   const stCls = st==="OBSERVED"?"ok":st==="PARTIAL"?"frag":st==="PENDING"?"pend":"stale";
   const hops = r.hops.map((h,i)=>{
     const arr = i ? `<span class="arr${r.dashed?" dim":""}">${r.dashed?"⇢":"→"}</span>` : "";
-    return `${arr}<div class="box ${h.type}" data-node="${h.id}"><b>${h.name}</b>${h.ccy?`<i>${h.ccy}</i>`:""}</div>`;
+    const cn = NODE_CN[h.id];
+    const sub = cn ? cn[1] + (h.ccy ? " · " + h.ccy : "") : (h.ccy || "");
+    return `${arr}<div class="box ${h.type}" data-node="${h.id}"><b>${cn ? cn[0] : h.name}</b>${sub?`<i>${sub}</i>`:""}</div>`;
   }).join("");
   return `<div class="row rail-${r.rail==="counterparty"?"cpty":r.rail==="regulated"?"reg":"plat"}">
     <div class="row-main">
       <span class="num">${r.id}</span>
-      <div class="st ${stCls}">${st}</div>
+      <div class="st ${stCls}">${ST_CN[st]}</div>
       <div class="tag">${r.purpose}</div>
       <div class="flow">${hops}</div>
     </div>
@@ -481,7 +502,7 @@ function rowHtml(r){
       <div>损耗 <b>${r.cost}</b></div>
       <div>时延 <b>${r.latency}</b></div>
       <div>限额 <b>${r.limit}</b></div>
-      <div>轨道 <b>${r.rail}</b> · 版本 ${r.version}</div>
+      <div>轨道 <b>${RAIL_CN[r.rail]}</b> · 版本 ${r.version}</div>
       <div>合规 <b>${r.compliance}</b></div>
     </div>
   </div>`;
@@ -499,7 +520,7 @@ function renderList(){
   groups.forEach(([st,cls,label])=>{
     const rows = list.filter(r=>effectiveStatus(r)===st);
     if(!rows.length) return;
-    html += `<section class="group"><div class="ghead ${cls}">${st} <small>${rows.length} ROUTES · ${label}</small></div>${rows.map(rowHtml).join("")}</section>`;
+    html += `<section class="group"><div class="ghead ${cls}">${ST_CN[st]} <small>${rows.length} 条 · ${label}</small></div>${rows.map(rowHtml).join("")}</section>`;
   });
   document.getElementById("list").innerHTML = html || '<div class="empty">无匹配链路。清除筛选后重试。</div>';
 }
@@ -539,8 +560,8 @@ function renderGraph(){
     const rr=8+Math.min(n.deg,8)*1.6;
     ctx.beginPath(); ctx.fillStyle=color[n.type]||"#94a3b8";
     ctx.arc(n.x,n.y,rr,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="#dbe4ee"; ctx.font="11px ui-monospace,monospace"; ctx.textAlign="center";
-    ctx.fillText(n.name, n.x, n.y+rr+12);
+    ctx.fillStyle="#dbe4ee"; ctx.font="11px ui-monospace,'PingFang SC','Noto Sans CJK SC',sans-serif"; ctx.textAlign="center";
+    ctx.fillText(nodeLabel(n), n.x, n.y+rr+12);
   });
 }
 
@@ -569,7 +590,9 @@ function fillSelects(){
 
 function render(){
   document.getElementById("asOfTop").textContent = DATA.dataAsOf;
-  document.getElementById("asOfFoot").textContent = DATA.dataAsOf + " · APP " + DATA.version;
+  document.getElementById("asOfFoot").textContent = DATA.dataAsOf + " · 版本 " + DATA.version;
+  document.getElementById("verLabel").textContent = "V" + DATA.version;
+  document.title = "出入金链路 · 观测稿 V" + DATA.version;
   document.getElementById("staleDays").textContent = DATA.staleAfterDays;
   renderLegend();
   renderKpis();
@@ -623,7 +646,7 @@ function tick(){
   const bj=new Date(now.getTime()+8*3600*1000);
   document.getElementById("cBj").textContent=pad(bj.getUTCHours())+":"+pad(bj.getUTCMinutes())+":"+pad(bj.getUTCSeconds());
   document.getElementById("liveLamp").classList.add("on");
-  document.getElementById("liveLamp").lastChild.nodeValue=" CLOCK";
+  document.getElementById("liveLamp").lastChild.nodeValue=" 时钟";
 }
 fillSelects();
 render();
